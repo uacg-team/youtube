@@ -36,7 +36,7 @@ public class DateTimeConvertor {
 		ResultSet rs=ps.executeQuery();
 		rs.next();
 		String s = rs.getString(1);
-		DBConnection.CON1.close();
+		DBConnection.CON1.closeConnection();
 		System.out.println(fromSqlDateTimeToLocalDateTime(s));
 		System.out.println(s);
 	}
