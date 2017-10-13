@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 
 public class Video {
 
@@ -14,19 +15,22 @@ public class Video {
 	private String description;
 	private long privacy_id;
 
-	public Video(String name, String location_url, long privacy_id, long user_id) {
+	private HashSet<Tag> tags = new HashSet<>();
+
+	public Video(String name, String location_url, long privacy_id, long user_id, HashSet<Tag> tags) {
 		this.name = name;
 		this.location_url = location_url;
 		this.privacy_id = privacy_id;
 		this.date = LocalDateTime.now();
 		this.views = 0;
 		this.user_id = user_id;
+		this.tags = tags;
 	}
 
 	public LocalDateTime getDate() {
 		return date;
 	}
-	
+
 	public String getDescription() {
 		return description;
 	}
