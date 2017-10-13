@@ -17,9 +17,15 @@ public class Comment {
 	private int video_id;
 	private Comment replayTo;
 
-	public Comment(long id, String text, LocalDateTime date, int user_id, int video_id, Comment replayTo) {
-		// valid
-		this.id = id;
+	/**
+	 * use for get comment from db
+	 * 
+	 * @throws InvalidCommentIdException
+	 */
+	public Comment(long id, String text, LocalDateTime date, int user_id, int video_id, Comment replayTo)
+			throws InvalidCommentIdException {
+		// validate
+		setId(id);
 		this.text = text;
 		this.date = date;
 		this.replays = new LinkedList<>();
@@ -28,7 +34,10 @@ public class Comment {
 		this.replayTo = replayTo;
 	}
 
-	public Comment() {
+	/**
+	 * use for
+	 */
+	public Comment(String text, LocalDateTime date, int user_id, int video_id, Comment replayTo) {
 
 	}
 
@@ -83,8 +92,15 @@ public class Comment {
 
 	public void setUser_id(int user_id) {
 		if (user_id < 1) {
-			//TODO throw invalidUserIdException
+			// TODO throw invalidUserIdException
 		}
 		this.user_id = user_id;
+	}
+
+	public void setVideo_id(int video_id) {
+		if (user_id < 1) {
+			// TODO throw invalidUserIdException
+		}
+		this.video_id = video_id;
 	}
 }

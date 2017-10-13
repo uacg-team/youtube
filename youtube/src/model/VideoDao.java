@@ -24,6 +24,12 @@ public class VideoDao {
 		return instance;
 	}
 
+
+	public void insertVideo(Video v) throws SQLException {
+//		Connection con = DBManager.getInstance().getConnection();
+		PreparedStatement ps = con.prepareStatement(
+				"INSERT into videos (name, date, location_url, user_id, privacy_id, views) VALUES(?,?,?,?,?,?);",
+				Statement.RETURN_GENERATED_KEYS);
 	public static void main(String[] args) throws SQLException {
 		VideoDao.getInstance().createVideo(new Video("name", "url", 1, 1, null));
 	}
@@ -31,6 +37,7 @@ public class VideoDao {
 	public void createVideo(Video v) throws SQLException {
 		String sql = "INSERT into videos (name, date, location_url, user_id, privacy_id, views) VALUES(?,?,?,?,?,?);";
 		PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
 		ps.setString(1, v.getName());
 		String date = DateTimeConvertor.fromLocalDateTimeToSqlDateTime(v.getDate());
 		ps.setString(2, date);
