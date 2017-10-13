@@ -7,9 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import com.sun.jmx.snmp.SnmpStringFixed;
-
-import model.exceptions.user.UserNotFoundException;
 import model.exceptions.video.VideoException;
 import model.exceptions.video.VideoNotFoundException;
 import model.utils.DBConnection;
@@ -29,6 +26,7 @@ public class VideoDao {
 		return instance;
 	}
 
+	//OK
 	public void createVideo(Video v) throws SQLException {
 		String sql = "INSERT into videos (name, date, location_url, user_id, privacy_id, views) VALUES(?,?,?,?,?,?);";
 		PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -46,8 +44,9 @@ public class VideoDao {
 		v.setVideo_id(rs.getLong(1));
 	}
 
+	//OK
 	public void updateVideo(Video v) throws SQLException {
-		String sql = "UPDATE videos SET name = '?', description = '?', privacy_id = ? where video_id = ?;";
+		String sql = "UPDATE videos SET name = ?, description = ?, privacy_id = ? where video_id = ?;";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setString(1, v.getName());
 		ps.setString(2, v.getDescription());
@@ -56,16 +55,20 @@ public class VideoDao {
 		ps.executeUpdate();
 	}
 
+	// NOT OK
 	public void deleteVideo(Video v) throws SQLException {
+		// TODO: to be implement
+		// CommentDAO.getInstance().deleteComments(v);
 		String sql = "DELETE FROM videos WHERE video_id = ?;";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setLong(1, v.getVideo_id());
 		ps.executeUpdate();
 	}
 
+	// NOT OK
 	public ArrayList<Video> searchVideo(String search) throws SQLException {
 		// FIXME: try something different
-		String sql = "SELECT * from videos where name LIKE ? ;";
+		String sql = "SELECT * FROM videos WHERE name LIKE ?";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setString(1, "%" + search + "%");
 		ResultSet rs = ps.executeQuery(sql);
@@ -77,7 +80,9 @@ public class VideoDao {
 		return videos;
 	}
 
+	// NOT OK
 	public boolean existsVideo(Video v) throws SQLException {
+		// FIXME Problem with injection
 		String sql = "SELECT COUNT(*) FROM videos WHERE video_id = ?;";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setLong(1, v.getVideo_id());
@@ -88,17 +93,22 @@ public class VideoDao {
 		return false;
 	}
 
-	public static void main(String[] args) throws SQLException, VideoNotFoundException {
+	//TESTING
+	public static void main(String[] args) throws SQLException, VideoException {
 		// VideoDao.getInstance().createVideo(new Video("name", "url", 1, 1, null));
-		// VideoDao.getInstance().getVideo("www.somewhere1.com");
+		//Video video = VideoDao.getInstance().getVideo("www.somewhere1.com");
+		// VideoDao.getInstance().deleteVideo(video);
+		
+		VideoDao.getInstance().createVideo(new Video("name", "location_url", 1, 1, null));
+		//VideoDao.getInstance().updateVideo(video);
+		// System.out.println(VideoDao.getInstance().searchVideo("am").toString());
 
-		// System.out.println(VideoDao.getInstance().searchVideo("na").toString());
-		
-		
 		System.out.println("Good");
 	}
 
+	// NOT READY
 	public Video getVideo(String location_url) throws VideoNotFoundException, SQLException {
+		// TODO: get all tags for this video
 		String sql = "SELECT * FROM videos WHERE location_url = ?;";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setString(1, location_url);

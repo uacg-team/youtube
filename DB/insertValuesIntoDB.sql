@@ -1,5 +1,6 @@
 SELECT * FROM youtubedb.users;
 SELECT * FROM youtubedb.videos;
+SELECT * FROM youtubedb.videoprivacy_settingss;
 SELECT * FROM youtubedb.privacy_settings;
 
 DELETE FROM users;
@@ -16,8 +17,11 @@ SELECT username, password FROM users WHERE username = 'Hristo';
 
 SELECT COUNT(*) as number FROM users WHERE username = 'Hristo';
 
+UPDATE videos SET name = 'newName',description = 'newDesc', privacy_id=2 where video_id =1;
 
+DELETE FROM videos WHERE video_id = 1;
 
+SELECT * from videos where name LIKE '%na%';
 
-
+SELECT * FROM videos WHERE location_url = 'www.somewhere1.com';
 

@@ -22,7 +22,7 @@ USE `youtubeDB` ;
 CREATE TABLE IF NOT EXISTS `youtubeDB`.`users` (
   `user_id` INT NOT NULL AUTO_INCREMENT,
   `username` VARCHAR(50) NOT NULL COMMENT 'username fro account\n',
-  `password` VARCHAR(50) NOT NULL,
+  `password` VARCHAR(128) NOT NULL,
   `facebook` VARCHAR(50) NULL,
   `email` VARCHAR(50) NOT NULL,
   `date_creation` DATETIME NOT NULL,
