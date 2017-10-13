@@ -142,7 +142,10 @@ public class User {
 		this.last_name = last_name;
 	}
 
-	public void setUser_id(long user_id) {
+	public void setUser_id(long user_id) throws UserException {
+		if (user_id<1) {
+			throw new UserException(UserException.INVALID_ID);
+		}
 		this.user_id = user_id;
 	}
 }

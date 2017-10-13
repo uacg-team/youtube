@@ -9,6 +9,9 @@ import java.util.ArrayList;
 
 import com.sun.jmx.snmp.SnmpStringFixed;
 
+import model.exceptions.user.UserNotFoundException;
+import model.exceptions.video.VideoException;
+import model.exceptions.video.VideoNotFoundException;
 import model.utils.DBConnection;
 import model.utils.DateTimeConvertor;
 
@@ -86,6 +89,28 @@ public class VideoDao {
 			return true;
 		}
 		return false;
+	}
+	
+	public Video getVideo(String location_url) throws VideoNotFoundException, SQLException {
+		String sql = "SELECT * FROM videos WHERE location_url = '?';";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setString(1, location_url);
+		ResultSet rs = ps.executeQuery();
+		
+		if (rs.next()) {
+			return new Video(
+					rs.getLong("video_id"),
+					rs.getString("name"),
+					rs.getInt("views"),
+					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date")), 
+					rs.getString("location_url"),
+					rs.getLong("user_id"),
+					rs.getString("thumbnail_url"),
+					rs.getString("description"),
+					rs.getLong("privacy_id"),
+					null);
+		}
+		throw new VideoNotFoundException(VideoException.NOT_FOUND);
 	}
 
 }
