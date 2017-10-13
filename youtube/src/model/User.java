@@ -5,14 +5,6 @@ import java.time.LocalDateTime;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
-import model.exceptions.user.InvalidEmailException;
-import model.exceptions.user.InvalidFacebookException;
-import model.exceptions.user.InvalidNameException;
-import model.exceptions.user.InvalidNameLengthException;
-import model.exceptions.user.InvalidPasswordException;
-import model.exceptions.user.InvalidPasswordLengthException;
-import model.exceptions.user.InvalidUsernameException;
-import model.exceptions.user.InvalidUsernameLengthException;
 import model.exceptions.user.UserException;
 import model.utils.Hash;
 
@@ -59,22 +51,22 @@ public class User {
 		this.date_creation = LocalDateTime.now();
 	}
 
-	private void setEmail(String email) throws InvalidEmailException {
+	private void setEmail(String email) throws UserException {
 		try {
 			InternetAddress emailAddr = new InternetAddress(email);
 			emailAddr.validate();
 		} catch (AddressException ex) {
-			throw new InvalidEmailException();
+			throw new UserException(UserException.INVALID_EMAIL);
 		}
 		this.email = email;
 	}
 
 	private void setPassword(String password) throws UserException {
 		if (password == null || password.isEmpty()) {
-			throw new InvalidPasswordException();
+			throw new UserException(UserException.INVALID_PASSWORD);
 		}
 		if (password.length() < MIN_PASSWORD_LENGTH) {
-			throw new InvalidPasswordLengthException();
+			throw new UserException(UserException.INVALID_PASSWORD_LENGTH);
 		}
 		// TODO: Check for strong password
 		this.password = Hash.getHashPass(password);
@@ -82,10 +74,10 @@ public class User {
 
 	private void setUsername(String username) throws UserException {
 		if (username == null || username.isEmpty()) {
-			throw new InvalidUsernameException();
+			throw new UserException(UserException.INVALID_USERNAME);
 		}
 		if (username.length() < MIN_USERNAME_LENGTH) {
-			throw new InvalidUsernameLengthException();
+			throw new UserException(UserException.INVALID_USERNAME_LENGTH);
 		}
 		this.username = username;
 	}
@@ -122,30 +114,30 @@ public class User {
 		return username;
 	}
 
-	public void setFacebook(String facebook) throws InvalidFacebookException {
+	public void setFacebook(String facebook) throws UserException {
 		String fbProfileRegex = "((http|https):\\/\\/)?(www[.])?facebook.com\\/.+";
 		if (facebook.matches(fbProfileRegex)) {
 			this.facebook = facebook;
 		}
-		throw new InvalidFacebookException();
+		throw new UserException(UserException.INVALID_FACEBOOK);
 	}
 
 	public void setFirst_name(String first_name) throws UserException {
 		if (first_name == null || first_name.isEmpty()) {
-			throw new InvalidNameException();
+			throw new UserException(UserException.INVALID_NAME);
 		}
 		if (first_name.length() < MIN_FIRST_NAME_LENGTH) {
-			throw new InvalidNameLengthException();
+			throw new UserException(UserException.INVALID_NAME_LENGTH);
 		}
 		this.first_name = first_name;
 	}
 
 	public void setLast_name(String last_name) throws UserException {
 		if (last_name == null || first_name.isEmpty()) {
-			throw new InvalidNameException();
+			throw new UserException(UserException.INVALID_NAME);
 		}
 		if (last_name.length() < MIN_LAST_NAME_LENGTH) {
-			throw new InvalidNameLengthException();
+			throw new UserException(UserException.INVALID_NAME_LENGTH);
 		}
 		this.last_name = last_name;
 	}
