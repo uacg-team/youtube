@@ -2,6 +2,11 @@ package model;
 
 public class Tag {
 
+	@Override
+	public String toString() {
+		return "Tag [tag=" + tag + "]";
+	}
+
 	private long tag_id;
 	private String tag;
 

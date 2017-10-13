@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import model.exceptions.video.VideoException;
 import model.exceptions.video.VideoNotFoundException;
@@ -55,10 +56,12 @@ public class VideoDao {
 		ps.executeUpdate();
 	}
 
-	// NOT OK
+	// NOT OK - NOT EVEN CLOSE
 	public void deleteVideo(Video v) throws SQLException {
 		// TODO: to be implement
-		// CommentDAO.getInstance().deleteComments(v);
+		// TODO: delete all likes for this video_id
+		// TODO: delete all videos from playlist
+		// TODO: delete all tags for this video_id
 		String sql = "DELETE FROM videos WHERE video_id = ?;";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setLong(1, v.getVideo_id());
@@ -67,7 +70,7 @@ public class VideoDao {
 
 	// NOT OK
 	public ArrayList<Video> searchVideo(String search) throws SQLException {
-		// FIXME: try something different
+		// FIXME: Problem with injection
 		String sql = "SELECT * FROM videos WHERE name LIKE ?";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setString(1, "%" + search + "%");
@@ -96,19 +99,29 @@ public class VideoDao {
 	//TESTING
 	public static void main(String[] args) throws SQLException, VideoException {
 		// VideoDao.getInstance().createVideo(new Video("name", "url", 1, 1, null));
-		//Video video = VideoDao.getInstance().getVideo("www.somewhere1.com");
-		// VideoDao.getInstance().deleteVideo(video);
+		// Video video = VideoDao.getInstance().getVideo("www.somewhere1.com");
+		// System.out.println(video);
+		//CommentDAO.getInstance().deleteComments(video);
+		//VideoDao.getInstance().deleteVideo(video);
 		
-		VideoDao.getInstance().createVideo(new Video("name", "location_url", 1, 1, null));
+		//VideoDao.getInstance().createVideo(new Video("name", "location_url", 1, 1, null));
 		//VideoDao.getInstance().updateVideo(video);
 		// System.out.println(VideoDao.getInstance().searchVideo("am").toString());
 
 		System.out.println("Good");
 	}
 
-	// NOT READY
+	// OK
 	public Video getVideo(String location_url) throws VideoNotFoundException, SQLException {
-		// TODO: get all tags for this video
+		HashSet<Tag> tags = new HashSet<>();
+		String getTags = "SELECT tags.tag FROM videos_has_tags JOIN tags USING (tag_id) JOIN videos ON (videos_has_tags.video_id = videos.video_id) WHERE location_url = ? ;";
+		PreparedStatement ps_tags = con.prepareStatement(getTags);
+		ps_tags.setString(1, location_url);
+		ResultSet rs1 = ps_tags.executeQuery();
+		while(rs1.next()) {
+			tags.add(new Tag(rs1.getString("tag")));
+		}
+		
 		String sql = "SELECT * FROM videos WHERE location_url = ?;";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setString(1, location_url);
@@ -118,7 +131,7 @@ public class VideoDao {
 			Video video = new Video(rs.getLong("video_id"), rs.getString("name"), rs.getInt("views"),
 					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date")),
 					rs.getString("location_url"), rs.getLong("user_id"), rs.getString("thumbnail_url"),
-					rs.getString("description"), rs.getLong("privacy_id"));
+					rs.getString("description"), rs.getLong("privacy_id"), tags);
 			return video;
 		}
 
