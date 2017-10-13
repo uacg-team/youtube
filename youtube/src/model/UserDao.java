@@ -6,8 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.ParameterList;
-
+import model.exceptions.user.UserException;
 import model.exceptions.user.UserNotFoundException;
 import model.utils.DBConnection;
 import model.utils.DateTimeConvertor;
@@ -27,14 +26,13 @@ public class UserDao {
 		return instance;
 	}
 
-	public void insertUser(User u) throws SQLException {
+	public void insertUser(User u) throws SQLException, UserException {
 		PreparedStatement ps = con.prepareStatement(
 				"INSERT INTO users (username, password, email, date_creation) VALUES (?, ?, ?,?)",
 				Statement.RETURN_GENERATED_KEYS);
 		ps.setString(1, u.getUsername());
 		ps.setString(2, u.getPassword());
 		ps.setString(3, u.getEmail());
-		// ps.setString(4, u.getDate_creation().toString());
 		ps.setDate(4, java.sql.Date.valueOf(u.getDate_creation().toLocalDate()));
 		ps.executeUpdate();
 		ResultSet rs = ps.getGeneratedKeys();
@@ -52,12 +50,10 @@ public class UserDao {
 		Statement stmt = con.createStatement();
 		String sql = "SELECT COUNT(*) as number FROM users WHERE username = '" + u.getUsername() + "';";
 		ResultSet rs = stmt.executeQuery(sql);
-
-		if (!rs.next()) {
-			// ResultSet is empty
-			return false;
+		if (rs.next()) {
+			return true;
 		}
-		return true;
+		return false;
 
 	}
 

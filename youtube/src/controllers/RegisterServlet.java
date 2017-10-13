@@ -43,6 +43,8 @@ public class RegisterServlet extends HttpServlet {
 			}
 		} catch (SQLException e) {
 			response.getWriter().append("SQLException: " + e.getMessage());
+		} catch (UserException e) {
+			response.getWriter().append("UserException: " + e.getMessage());
 		}
 	}
 

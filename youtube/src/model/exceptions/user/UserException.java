@@ -10,6 +10,7 @@ public class UserException extends Exception {
 	public static final String INVALID_NAME_LENGTH = "Invalid name length";
 	public static final String INVALID_FACEBOOK = "Invalid facebook";
 	public static final String INVALID_EMAIL = "Invalid email";
+	public static final String INVALID_ID = "Invalid user id";
 	
 	public UserException(String message) {
 		super(message);
