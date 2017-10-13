@@ -72,7 +72,7 @@ public class UserDao {
 	 */
 	public User getUser(String username) throws SQLException, UserNotFoundException {
 		Statement stmt = con.createStatement();
-		String sql = "SELECT username, password FROM users WHERE username = '" + username + "';";
+		String sql = "SELECT * FROM users WHERE username = '" + username + "';";
 		ResultSet rs = stmt.executeQuery(sql);
 		if (rs.next()) {
 			String name = rs.getString("username");
