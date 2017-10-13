@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import model.exceptions.comments.CommentException;
@@ -62,9 +63,12 @@ public class CommentDAO {
 
 	/**
 	 * @param c-comment
+	 *            with changes
 	 * @throws SQLException
-	 * @throws CommentNotFoundException - if cant find comment
-	 * @throws CommentException -if cant update in db
+	 * @throws CommentNotFoundException
+	 *             - if cant find comment
+	 * @throws CommentException
+	 *             -if cant update in db
 	 */
 	public void updateComment(Comment c) throws SQLException, CommentException {
 		String foundComment = "select comment_id from comments where comment_id=?;";
@@ -90,14 +94,94 @@ public class CommentDAO {
 		} else {
 			ps.setString(5, null);
 		}
-		int i =ps.executeUpdate();
-		if(i==0) {
+		int i = ps.executeUpdate();
+		ps.close();
+		if (i == 0) {
 			throw new CommentException(CommentException.CANT_UPDATE);
 		}
 	}
 
-	public void deleteComment(Comment c) {
-		// TODO delete comment from db cascade to replays.
+	/**
+	 * 
+	 * @param c
+	 * @return comments deleted
+	 * @throws CommentException
+	 * @throws SQLException
+	 */
+	public int deleteComment(Comment c) throws CommentException, SQLException {
+		int count;
+		count = deleteAllReplaysToComment(c);
+		String sql = "delete from comments where comment_id=?";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setLong(1, c.getId());
+		count += ps.executeUpdate();
+		return count;
+	}
+
+	/**
+	 * @param c
+	 * @return count deleted comments
+	 * @throws SQLException
+	 * @throws CommentException
+	 */
+	private int deleteAllReplaysToComment(Comment c) throws SQLException, CommentException {
+		if (c.getId() == 0) {
+			throw new CommentException(CommentException.INVALID_ID);
+		}
+		String sql = "delete from comments where comment_id in "
+				+ "(select * from (select r.comment_id from comments as c "
+				+ "inner join comments as r on (r.replay_id = c.comment_id) where c.comment_id=?) as d);";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setLong(1, c.getId());
+		int count = ps.executeUpdate();
+		ps.close();
+		return count;
+	}
+	@Deprecated
+	/**
+	 * @param c
+	 * @return count deleted comments
+	 * @throws SQLException
+	 * @throws CommentException
+	 */
+	private int deleteAllReplaysToComments(ArrayList<Integer> comment_ids) throws SQLException {
+		if (comment_ids == null || comment_ids.isEmpty()) {
+			throw new NullPointerException("ArrayList comments_id is empty");
+		}
+		StringBuilder prepareStatement = new StringBuilder();
+		for (int i : comment_ids) {
+			prepareStatement.append("c.comment_id=" + i + " or ");
+		}
+		// because " or " is 4 symbols -1 = 3
+		String statement = prepareStatement.substring(0, prepareStatement.length() - 3);
+		//There is no risk for sql injection because input is only integers!
+		String sql = "delete from comments where comment_id in "
+				+ "(select * from (select r.comment_id from comments as c "
+				+ "inner join comments as r on (r.replay_id = c.comment_id) where " + statement + " ) as d);";
+		PreparedStatement ps = con.prepareStatement(sql);
+		int count = ps.executeUpdate();
+		ps.close();
+		return count;
+	}
+	/**
+	 * 
+	 * @param video with id
+	 * @return deleted comments
+	 * @throws SQLException
+	 */
+	public int deleteComments(Video video) throws SQLException {
+		int count = 0;
+		String deleteReplays ="delete from comments where video_id = ? and replay_id is not null;";
+		String deleteComments = "delete from comments where video_id = ?";
+		PreparedStatement ps = con.prepareStatement(deleteReplays);
+		ps.setLong(1, video.getVideo_id());
+		count += ps.executeUpdate();
+		ps.close();
+		ps = con.prepareStatement(deleteComments);
+		ps.setLong(1, video.getVideo_id());
+		count += ps.executeUpdate();
+		ps.close();
+		return count;
 	}
 
 	public void likeComment(Comment c, User u) {
@@ -115,38 +199,98 @@ public class CommentDAO {
 		return null;
 	}
 
-	public int getLikes(Comment c) {
-		// TODO get Number of likes from comments_likes,-1 not existing video
-		return 0;
+	/**
+	 * @param c-comment
+	 *            must be with id!
+	 * @return integer
+	 * @throws SQLException
+	 */
+	public int getLikes(Comment c) throws SQLException {
+		String sql = "select count(*) from comments_likes where comment_id=? and isLike = 1;";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setLong(1, c.getId());
+		ResultSet rs = ps.executeQuery();
+		// there is always information
+		rs.next();
+		int likes = rs.getInt(1);
+		ps.close();
+		rs.close();
+		return likes;
 	}
 
-	public int getDislikes(Comment c) {
-		// TODO get Number of dislikes from comments_likes,-1 not existing
-		// comment id
-		return 0;
+	/**
+	 * @param c-comment
+	 *            must be with id!
+	 * @return integer
+	 * @throws SQLException
+	 */
+	public int getDislikes(Comment c) throws SQLException {
+		String sql = "select count(*) from comments_likes where comment_id=? and isLike = 0;";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setLong(1, c.getId());
+		ResultSet rs = ps.executeQuery();
+		int dislikes = rs.getInt(1);
+		// there is always information
+		rs.next();
+		ps.close();
+		rs.close();
+		return dislikes;
 	}
-
+	public void replayToComment(Comment comment,User user) {
+		//TODO
+	}
+	public void replayToVideo(Video video,User user) {
+		//TODO
+	}
 	// test
-	public static void main(String[] args) throws SQLException, UserNotFoundException, VideoNotFoundException {
-//		try {
-//			Comment c = new Comment(3, "alsdja", LocalDateTime.now(), null, 2, 1, (long) 0);
-//			CommentDAO.getInstance().createComment(c);
-//		} catch (SQLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (CommentException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+	public static void main(String[] args) {
+		/* add comment */
+		// try {
+		// Comment c = new Comment(3, "alsdja", LocalDateTime.now(), null, 2, 1,
+		// (long) 0);
+		// CommentDAO.getInstance().createComment(c);
+		// } catch (SQLException e) {
+		// e.printStackTrace();
+		// } catch (CommentException e) {
+		// e.printStackTrace();
+		// }
+		/* change comment */
+		// try {
+		// Comment c = new Comment(3, "ala bala", LocalDateTime.now(), null, 2,
+		// 1, (long) 0);
+		// c.setDate(LocalDateTime.now());
+		// CommentDAO.getInstance().updateComment(c);
+		// } catch (CommentException e) {
+		// e.printStackTrace();
+		// }
+		/* get likes */
+		// try {
+		// Comment c = new Comment(150, "ala bala", LocalDateTime.now(), null,
+		// 2, 1, (long) 0);
+		// System.out.println(CommentDAO.getInstance().getLikes(c));
+		// } catch (SQLException e) {
+		// e.printStackTrace();
+		// }
+		/* get dislikes */
+		// try {
+		// Comment c = new Comment(0, "ala bala", LocalDateTime.now(), null, 2,
+		// 1, (long) 0);
+		// System.out.println(CommentDAO.getInstance().getLikes(c));
+		// } catch (SQLException e) {
+		// e.printStackTrace();
+		// }
+		ArrayList<Integer> ints = new ArrayList<>();
+		ints.add(1);
 		try {
-			Comment c = new Comment(3, "ala bala", LocalDateTime.now(), null, 2, 1, (long) 0);
-			c.setDate(LocalDateTime.now());
-			CommentDAO.getInstance().updateComment(c);
-		} catch (CommentException e) {
-			// TODO Auto-generated catch block
+			CommentDAO.getInstance().deleteAllReplaysToComments(ints);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			DBConnection.CON1.closeConnection();
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		DBConnection.CON1.closeConnection();
-		
+
 	}
 }
