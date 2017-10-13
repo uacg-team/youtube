@@ -29,10 +29,6 @@ public class VideoDao {
 		return instance;
 	}
 
-	public static void main(String[] args) throws SQLException {
-		VideoDao.getInstance().createVideo(new Video("name", "url", 1, 1, null));
-	}
-
 	public void createVideo(Video v) throws SQLException {
 		String sql = "INSERT into videos (name, date, location_url, user_id, privacy_id, views) VALUES(?,?,?,?,?,?);";
 		PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -64,13 +60,14 @@ public class VideoDao {
 		String sql = "DELETE FROM videos WHERE video_id = ?;";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setLong(1, v.getVideo_id());
-		ps.executeQuery();
+		ps.executeUpdate();
 	}
 
 	public ArrayList<Video> searchVideo(String search) throws SQLException {
-		String sql = "SELECT * from videos where name LIKE '%?%';";
+		// FIXME: try something different
+		String sql = "SELECT * from videos where name LIKE ? ;";
 		PreparedStatement ps = con.prepareStatement(sql);
-		ps.setString(1, search);
+		ps.setString(1, "%" + search + "%");
 		ResultSet rs = ps.executeQuery(sql);
 		ArrayList<Video> videos = new ArrayList<>();
 		while (rs.next()) {
@@ -81,7 +78,7 @@ public class VideoDao {
 	}
 
 	public boolean existsVideo(Video v) throws SQLException {
-		String sql = "SELECT COUNT(*) FROM videos WHERE video_id = '?';";
+		String sql = "SELECT COUNT(*) FROM videos WHERE video_id = ?;";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setLong(1, v.getVideo_id());
 		ResultSet rs = ps.executeQuery(sql);
@@ -90,26 +87,31 @@ public class VideoDao {
 		}
 		return false;
 	}
-	
+
+	public static void main(String[] args) throws SQLException, VideoNotFoundException {
+		// VideoDao.getInstance().createVideo(new Video("name", "url", 1, 1, null));
+		// VideoDao.getInstance().getVideo("www.somewhere1.com");
+
+		// System.out.println(VideoDao.getInstance().searchVideo("na").toString());
+		
+		
+		System.out.println("Good");
+	}
+
 	public Video getVideo(String location_url) throws VideoNotFoundException, SQLException {
-		String sql = "SELECT * FROM videos WHERE location_url = '?';";
+		String sql = "SELECT * FROM videos WHERE location_url = ?;";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setString(1, location_url);
 		ResultSet rs = ps.executeQuery();
-		
+
 		if (rs.next()) {
-			return new Video(
-					rs.getLong("video_id"),
-					rs.getString("name"),
-					rs.getInt("views"),
-					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date")), 
-					rs.getString("location_url"),
-					rs.getLong("user_id"),
-					rs.getString("thumbnail_url"),
-					rs.getString("description"),
-					rs.getLong("privacy_id"),
-					null);
+			Video video = new Video(rs.getLong("video_id"), rs.getString("name"), rs.getInt("views"),
+					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date")),
+					rs.getString("location_url"), rs.getLong("user_id"), rs.getString("thumbnail_url"),
+					rs.getString("description"), rs.getLong("privacy_id"));
+			return video;
 		}
+
 		throw new VideoNotFoundException(VideoException.NOT_FOUND);
 	}
 

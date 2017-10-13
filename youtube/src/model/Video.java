@@ -43,7 +43,7 @@ public class Video {
 	 *            - video tags
 	 */
 	public Video(long video_id, String name, int views, LocalDateTime date, String location_url, long user_id,
-			String thumbnail_url, String description, long privacy_id, HashSet<Tag> tags) {
+			String thumbnail_url, String description, long privacy_id) {
 		this.video_id = video_id;
 		this.name = name;
 		this.views = views;
@@ -53,9 +53,9 @@ public class Video {
 		this.thumbnail_url = thumbnail_url;
 		this.description = description;
 		this.privacy_id = privacy_id;
-		this.tags = tags;
 	}
 
+	
 	/**
 	 * Use this constructor when uploading new video Creating video
 	 * 
