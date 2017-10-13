@@ -20,7 +20,7 @@ public class VideoDao {
 	}
 
 	public void insertVideo(Video v) throws SQLException {
-		Connection con = DBManager.getInstance().getConnection();
+//		Connection con = DBManager.getInstance().getConnection();
 		PreparedStatement ps = con.prepareStatement(
 				"INSERT into videos (name, date, location_url, user_id, privacy_id, views) VALUES(?,?,?,?,?,?);",
 				Statement.RETURN_GENERATED_KEYS);
