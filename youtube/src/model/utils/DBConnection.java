@@ -10,9 +10,9 @@ public enum DBConnection {
 	CON1();
 	private final String DB_IP = "127.0.0.1";
 	private final String DB_PORT = "3306";
-	private final String DB_NAME = "youtube...";
-	private final String DB_USER = "root...";
-	private final String DB_PASS = "pass...";
+	private final String DB_NAME = "youtubedb...";
+	private final String DB_USER = "root";
+	private final String DB_PASS = "pass....";
 	private final String URL = "jdbc:mysql://" + DB_IP + ":" + DB_PORT + "/" + DB_NAME;
 	
 	private Connection connection;
@@ -31,7 +31,7 @@ public enum DBConnection {
 	public Connection getConnection() {
 		return connection;
 	}
-	public void close() throws SQLException {
+	public void closeConnection() throws SQLException {
 		connection.close();
 	}
 }
