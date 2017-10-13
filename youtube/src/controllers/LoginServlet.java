@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import model.User;
 import model.UserDao;
-import model.exceptions.UserNotFoundException;
+import model.exceptions.user.UserNotFoundException;
 
 /**
  * Servlet implementation class LoginServlet
@@ -24,17 +24,18 @@ public class LoginServlet extends HttpServlet {
 			throws ServletException, IOException {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
+		
 		try {
 			User u = UserDao.getInstance().getUser(username);
 			if (u.getPassword().equals(password)) {
-				response.getWriter().append("Successfully logged in");
-			}else {
-				response.getWriter().append("wrong password");
+				request.getRequestDispatcher("home.html").forward(request, response);
+			} else {
+				request.getRequestDispatcher("login.html").forward(request, response);
 			}
 		} catch (SQLException e) {
 			response.getWriter().append("SQLException: " + e.getMessage());
 		} catch (UserNotFoundException e) {
-			response.getWriter().append("User do not exist");
+			request.getRequestDispatcher("login.html").forward(request, response);
 		}
 	}
 

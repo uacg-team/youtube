@@ -2,6 +2,10 @@ package model;
 
 import java.time.LocalDateTime;
 
+import model.exceptions.user.UsernameEmptyException;
+import model.exceptions.user.UsernameLengthException;
+import model.exceptions.user.UsernameNullException;
+
 /**
  * USER POJO Class
  * 
@@ -9,6 +13,9 @@ import java.time.LocalDateTime;
  *
  */
 public class User {
+	
+	private static final int MIN_USERNAME_LENGTH = 3;
+	
 	private long user_id;
 	private String username;
 	private String password;
@@ -22,12 +29,28 @@ public class User {
 		this.username = username;
 		this.password = password;
 	}
-	
-	public User(String username, String password, String email) {
-		this.username = username;
+
+	public User(String username, String password, String email)
+			throws UsernameNullException, UsernameEmptyException, UsernameLengthException {
+		setUsername(username);
+
 		this.password = password;
 		this.email = email;
 		this.date_creation = LocalDateTime.now();
+	}
+
+	private void setUsername(String username)
+			throws UsernameNullException, UsernameEmptyException, UsernameLengthException {
+		if (username == null) {
+			throw new UsernameNullException();
+		}
+		if (username.isEmpty()) {
+			throw new UsernameEmptyException();
+		}
+		if (username.length() < MIN_USERNAME_LENGTH) {
+			throw new UsernameLengthException();
+		}
+		this.username = username;
 	}
 
 	public LocalDateTime getDate_creation() {
