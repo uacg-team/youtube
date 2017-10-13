@@ -2,9 +2,19 @@ package model;
 
 import java.time.LocalDateTime;
 
-import model.exceptions.user.UsernameEmptyException;
-import model.exceptions.user.UsernameLengthException;
-import model.exceptions.user.UsernameNullException;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
+import model.exceptions.user.InvalidEmailException;
+import model.exceptions.user.InvalidFacebookException;
+import model.exceptions.user.InvalidNameException;
+import model.exceptions.user.InvalidNameLengthException;
+import model.exceptions.user.InvalidPasswordException;
+import model.exceptions.user.InvalidPasswordLengthException;
+import model.exceptions.user.InvalidUsernameException;
+import model.exceptions.user.InvalidUsernameLengthException;
+import model.exceptions.user.UserException;
+import model.utils.Hash;
 
 /**
  * USER POJO Class
@@ -13,9 +23,12 @@ import model.exceptions.user.UsernameNullException;
  *
  */
 public class User {
-	
+
+	private static final int MIN_FIRST_NAME_LENGTH = 3;
+	private static final int MIN_LAST_NAME_LENGTH = 3;
 	private static final int MIN_USERNAME_LENGTH = 3;
-	
+	private static final int MIN_PASSWORD_LENGTH = 6;
+
 	private long user_id;
 	private String username;
 	private String password;
@@ -25,30 +38,54 @@ public class User {
 	private String first_name;
 	private String last_name;
 
-	public User(String username, String password) {
+	// all fields
+	public User(long user_id, String username, String hashed_password, String facebook, String email,
+			LocalDateTime date_creation, String first_name, String last_name) {
+		this.user_id = user_id;
 		this.username = username;
-		this.password = password;
+		this.password = hashed_password;
+		this.facebook = facebook;
+		this.email = email;
+		this.date_creation = date_creation;
+		this.first_name = first_name;
+		this.last_name = last_name;
 	}
 
-	public User(String username, String password, String email)
-			throws UsernameNullException, UsernameEmptyException, UsernameLengthException {
+	// register user
+	public User(String username, String password, String email) throws UserException {
 		setUsername(username);
-
-		this.password = password;
-		this.email = email;
+		setPassword(password);
+		setEmail(email);
 		this.date_creation = LocalDateTime.now();
 	}
 
-	private void setUsername(String username)
-			throws UsernameNullException, UsernameEmptyException, UsernameLengthException {
-		if (username == null) {
-			throw new UsernameNullException();
+	private void setEmail(String email) throws InvalidEmailException {
+		try {
+			InternetAddress emailAddr = new InternetAddress(email);
+			emailAddr.validate();
+		} catch (AddressException ex) {
+			throw new InvalidEmailException();
 		}
-		if (username.isEmpty()) {
-			throw new UsernameEmptyException();
+		this.email = email;
+	}
+
+	private void setPassword(String password) throws UserException {
+		if (password == null || password.isEmpty()) {
+			throw new InvalidPasswordException();
+		}
+		if (password.length() < MIN_PASSWORD_LENGTH) {
+			throw new InvalidPasswordLengthException();
+		}
+		// TODO: Check for strong password
+		this.password = Hash.getHashPass(password);
+	}
+
+	private void setUsername(String username) throws UserException {
+		if (username == null || username.isEmpty()) {
+			throw new InvalidUsernameException();
 		}
 		if (username.length() < MIN_USERNAME_LENGTH) {
-			throw new UsernameLengthException();
+			throw new InvalidUsernameLengthException();
 		}
 		this.username = username;
 	}
@@ -85,19 +122,35 @@ public class User {
 		return username;
 	}
 
-	public void setFacebook(String facebook) {
-		this.facebook = facebook;
+	public void setFacebook(String facebook) throws InvalidFacebookException {
+		String fbProfileRegex = "((http|https):\\/\\/)?(www[.])?facebook.com\\/.+";
+		if (facebook.matches(fbProfileRegex)) {
+			this.facebook = facebook;
+		}
+		throw new InvalidFacebookException();
 	}
 
-	public void setFirst_name(String first_name) {
+	public void setFirst_name(String first_name) throws UserException {
+		if (first_name == null || first_name.isEmpty()) {
+			throw new InvalidNameException();
+		}
+		if (first_name.length() < MIN_FIRST_NAME_LENGTH) {
+			throw new InvalidNameLengthException();
+		}
 		this.first_name = first_name;
 	}
 
-	public void setLast_name(String last_name) {
+	public void setLast_name(String last_name) throws UserException {
+		if (last_name == null || first_name.isEmpty()) {
+			throw new InvalidNameException();
+		}
+		if (last_name.length() < MIN_LAST_NAME_LENGTH) {
+			throw new InvalidNameLengthException();
+		}
 		this.last_name = last_name;
 	}
 
-	public void setUser_id(long l) {
-		this.user_id = l;
+	public void setUser_id(long user_id) {
+		this.user_id = user_id;
 	}
 }

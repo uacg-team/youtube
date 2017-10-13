@@ -10,6 +10,7 @@ import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.ParameterList
 
 import model.exceptions.user.UserNotFoundException;
 import model.utils.DBConnection;
+import model.utils.DateTimeConvertor;
 
 public class UserDao {
 
@@ -76,9 +77,15 @@ public class UserDao {
 		if (rs.next()) {
 			String name = rs.getString("username");
 			if (name.equals(username)) {
-				String usernameDB = rs.getString("username");
-				String passwordDB = rs.getString("password");
-				return new User(usernameDB, passwordDB);
+				return new User(
+						rs.getLong("user_id"), 
+						rs.getString("username"), 
+						rs.getString("password"),
+						rs.getString("facebook"), 
+						rs.getString("email"), 
+						DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date_creation")),  
+						rs.getString("first_name"),
+						rs.getString("last_name"));
 			}
 		}
 		throw new UserNotFoundException();
