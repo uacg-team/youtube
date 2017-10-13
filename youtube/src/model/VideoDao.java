@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import com.sun.jmx.snmp.SnmpStringFixed;
+
 import model.utils.DBConnection;
 import model.utils.DateTimeConvertor;
 
@@ -24,12 +26,6 @@ public class VideoDao {
 		return instance;
 	}
 
-
-	public void insertVideo(Video v) throws SQLException {
-//		Connection con = DBManager.getInstance().getConnection();
-		PreparedStatement ps = con.prepareStatement(
-				"INSERT into videos (name, date, location_url, user_id, privacy_id, views) VALUES(?,?,?,?,?,?);",
-				Statement.RETURN_GENERATED_KEYS);
 	public static void main(String[] args) throws SQLException {
 		VideoDao.getInstance().createVideo(new Video("name", "url", 1, 1, null));
 	}
@@ -75,7 +71,8 @@ public class VideoDao {
 		ResultSet rs = ps.executeQuery(sql);
 		ArrayList<Video> videos = new ArrayList<>();
 		while (rs.next()) {
-			videos.add(new Video(rs.getString("name"), rs.getString("location_url"), rs.getLong("privacy_id"), rs.getLong("user_id"), null));
+			videos.add(new Video(rs.getString("name"), rs.getString("location_url"), rs.getLong("privacy_id"),
+					rs.getLong("user_id"), null));
 		}
 		return videos;
 	}
