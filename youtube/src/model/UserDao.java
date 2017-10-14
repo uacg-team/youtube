@@ -76,13 +76,12 @@ public class UserDao {
 		return false;
 	}
 	
-	// NOT OK
+	// OK
 	public ArrayList<User> searchUser(String username) throws SQLException, UserException {
-		// FIXME: Problem with injection
 		String sql = "SELECT * FROM users WHERE username LIKE ?";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setString(1, "%" + username + "%");
-		ResultSet rs = ps.executeQuery(sql);
+		ResultSet rs = ps.executeQuery();
 		
 		ArrayList<User> users = new ArrayList<>();
 		while (rs.next()) {
@@ -120,13 +119,12 @@ public class UserDao {
 		}
 	}
 
-	// NOT OK
+	// OK
 	public boolean existsUser(User u) throws SQLException {
-		// FIXME: Problem with injection
 		String sql = "SELECT COUNT(*) FROM users WHERE username = ? ;";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setString(1, u.getUsername());
-		ResultSet rs = ps.executeQuery(sql);
+		ResultSet rs = ps.executeQuery();
 		if (rs.next()) {
 			return true;
 		}

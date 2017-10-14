@@ -88,13 +88,12 @@ public class VideoDao {
 		ps.executeUpdate();
 	}
 
-	// NOT OK
+	// OK
 	public ArrayList<Video> searchVideo(String name) throws SQLException {
-		// FIXME: Problem with injection
 		String sql = "SELECT * FROM videos WHERE name LIKE ?";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setString(1, "%" + name + "%");
-		ResultSet rs = ps.executeQuery(sql);
+		ResultSet rs = ps.executeQuery();
 		ArrayList<Video> videos = new ArrayList<>();
 		while (rs.next()) {
 			videos.add(new Video(rs.getString("name"), rs.getString("location_url"), rs.getLong("privacy_id"),
@@ -111,22 +110,14 @@ public class VideoDao {
 
 		HashSet<Video> videos = new HashSet<>();
 		while (rs.next()) {
-			videos.add(
-					new Video(
-							rs.getLong("video_id"), 
-							rs.getString("name"), 
-							rs.getInt("views"),
-							DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date")),
-							rs.getString("location_url"), 
-							rs.getLong("user_id"), 
-							rs.getString("thumbnail_url"),
-							rs.getString("description"), 
-							rs.getLong("privacy_id"), 
-							getTags(rs.getString("location_url"))));
+			videos.add(new Video(rs.getLong("video_id"), rs.getString("name"), rs.getInt("views"),
+					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date")),
+					rs.getString("location_url"), rs.getLong("user_id"), rs.getString("thumbnail_url"),
+					rs.getString("description"), rs.getLong("privacy_id"), getTags(rs.getString("location_url"))));
 		}
 		return videos;
 	}
-	
+
 	// OK
 	public HashSet<Video> getAllVideoOrderByDate() throws SQLException {
 		String sql = "SELECT * FROM videos ORDER BY date DESC;";
@@ -135,18 +126,10 @@ public class VideoDao {
 
 		HashSet<Video> videos = new HashSet<>();
 		while (rs.next()) {
-			videos.add(
-					new Video(
-							rs.getLong("video_id"), 
-							rs.getString("name"), 
-							rs.getInt("views"),
-							DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date")),
-							rs.getString("location_url"), 
-							rs.getLong("user_id"), 
-							rs.getString("thumbnail_url"),
-							rs.getString("description"), 
-							rs.getLong("privacy_id"), 
-							getTags(rs.getString("location_url"))));
+			videos.add(new Video(rs.getLong("video_id"), rs.getString("name"), rs.getInt("views"),
+					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date")),
+					rs.getString("location_url"), rs.getLong("user_id"), rs.getString("thumbnail_url"),
+					rs.getString("description"), rs.getLong("privacy_id"), getTags(rs.getString("location_url"))));
 		}
 		return videos;
 	}
@@ -165,14 +148,13 @@ public class VideoDao {
 
 	// OK
 	public boolean existsVideo(Video v) throws SQLException {
-		// fixed
 		String sql = "SELECT COUNT(*) FROM videos WHERE video_id=?;";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setLong(1, v.getVideo_id());
 		ResultSet rs = ps.executeQuery();
-		//there is always info
+		// there is always info
 		rs.next();
-		if(rs.getInt(1)==0) {
+		if (rs.getInt(1) == 0) {
 			return false;
 		}
 		return true;
@@ -193,13 +175,13 @@ public class VideoDao {
 		// tags.add(new Tag("qko"));
 		// tags.add(new Tag("cool"));
 		// VideoDao.getInstance().createVideo(new Video("you", "tube", 1, 1, tags));
-		// System.out.println(VideoDao.getInstance().searchVideo("am").toString());
+		System.out.println(VideoDao.getInstance().searchVideo("am").toString());
 
 		// User user = new User("Pesho1", "asdasd", "hristo1@hristo.com");
 		// UserDao.getInstance().createUser(user);
 		// User u = UserDao.getInstance().getUser("Hristo");
 		// System.out.println(VideoDao.getInstance().getVideos(u));
-		System.out.println(VideoDao.getInstance().getAllVideoOrderByLikes());
+		// System.out.println(VideoDao.getInstance().getAllVideoOrderByLikes());
 		System.out.println("Good");
 	}
 
@@ -221,6 +203,7 @@ public class VideoDao {
 		throw new VideoNotFoundException(VideoException.NOT_FOUND);
 	}
 
+	// ОК
 	public ArrayList<Video> getVideos(User u) throws SQLException {
 		String sql = "Select * FROM videos WHERE user_id = ?;";
 		PreparedStatement ps = con.prepareStatement(sql);
@@ -247,5 +230,44 @@ public class VideoDao {
 
 		return allUserVideos;
 	}
+
+	// ОК
+	public boolean existLikeDislike(Video v, User u) throws SQLException {
+		String sql = "Select * FROM video_likes WHERE video_id = ? AND user_id = ?;";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setLong(1, v.getVideo_id());
+		ps.setLong(2, u.getUser_id());
+		ResultSet rs = ps.executeQuery();
+		return rs.next();
+	}
+
+	// ОК	
+	public boolean hasLike(Video v, User u) throws SQLException {
+		String sql = "Select isLike FROM video_likes WHERE video_id = ? AND user_id = ?;";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setLong(1, v.getVideo_id());
+		ps.setLong(2, u.getUser_id());
+		ResultSet rs = ps.executeQuery();
+		return rs.getBoolean("isLike");
+	}
+
+	// ОК
+	public void like(Video v, User u) throws SQLException {
+		String sql = "UPDATE video_likes SET isLike = 1 WHERE video_id = ? AND user_id = ?;";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setLong(1, v.getVideo_id());
+		ps.setLong(2, u.getUser_id());
+		ps.executeUpdate();
+	}
+
+	// ОК
+	public void disLike(Video v, User u) throws SQLException {
+		String sql = "UPDATE video_likes SET isLike = 0 WHERE video_id = ? AND user_id = ?;";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setLong(1, v.getVideo_id());
+		ps.setLong(2, u.getUser_id());
+		ps.executeUpdate();
+	}
+
 
 }
