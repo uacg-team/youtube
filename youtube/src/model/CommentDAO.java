@@ -10,7 +10,8 @@ import java.util.List;
 
 import model.exceptions.comments.CommentException;
 import model.exceptions.comments.CommentNotFoundException;
-import model.exceptions.user.UserNotFoundException;
+import model.exceptions.user.UserException;
+import model.exceptions.video.VideoException;
 import model.utils.DBConnection;
 import model.utils.DateTimeConvertor;
 
@@ -28,12 +29,8 @@ public class CommentDAO {
 		return instance;
 	}
 
-	public Comment getComment(LocalDateTime datetime, User user, Video video) {
-		// TODO
-		return null;
-	}
-
 	/**
+	 * <b>!Warning! set replay_id only to comment,not for replay!</b> 
 	 * @param c
 	 *            must have text,date,video_id,user_id,no need of id;
 	 * @throws SQLException
@@ -138,6 +135,7 @@ public class CommentDAO {
 		return count;
 	}
 
+	@SuppressWarnings("unused")
 	@Deprecated
 	/**
 	 * @param c
@@ -194,8 +192,16 @@ public class CommentDAO {
 	 * @param user
 	 *            - must have id
 	 * @throws SQLException
+	 * @throws CommentException
+	 * @throws UserException
 	 */
-	public void likeComment(Comment comment, User user) throws SQLException {
+	public void likeComment(Comment comment, User user) throws SQLException, CommentException, UserException {
+		if (comment.getId() == 0) {
+			throw new CommentException(CommentException.MISSING_ID);
+		}
+		if (user.getUser_id() == 0) {
+			throw new UserException(UserException.INVALID_ID);
+		}
 		String sql = "select isLike from comments_likes where user_id=? and comment_id=?;";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setLong(1, user.getUser_id());
@@ -219,8 +225,23 @@ public class CommentDAO {
 		rs.close();
 	}
 
-	public void dislikeComment(Comment comment, User user) throws SQLException {
-		//validation comment,user
+	/**
+	 * 
+	 * @param comment
+	 *            -must have comment_id
+	 * @param user
+	 *            - must have id
+	 * @throws SQLException
+	 * @throws CommentException
+	 * @throws UserException
+	 */
+	public void dislikeComment(Comment comment, User user) throws SQLException, CommentException, UserException {
+		if (comment.getId() == 0) {
+			throw new CommentException(CommentException.MISSING_ID);
+		}
+		if (user.getUser_id() == 0) {
+			throw new UserException(UserException.INVALID_ID);
+		}
 		String sql = "select isLike from comments_likes where user_id=? and comment_id=?;";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setLong(1, user.getUser_id());
@@ -244,9 +265,118 @@ public class CommentDAO {
 		rs.close();
 	}
 
-	public List<Comment> getAllReplays(Comment c) {
-		// TODO get all replays
-		return null;
+	/**
+	 * @param comment
+	 *            - comment must have id
+	 * @return -empty ArrayList list if no comments, or ordered list replays by
+	 *         date
+	 * @throws SQLException
+	 * @throws CommentException
+	 *             -if comment have no id
+	 */
+	public List<Comment> getAllReplays(Comment comment) throws SQLException, CommentException {
+		if (comment.getId() == 0) {
+			throw new CommentException(CommentException.MISSING_ID);
+		}
+		String sql = "select * from comments where replay_id=? order by date;";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setLong(1, comment.getId());
+		ResultSet rs = ps.executeQuery();
+		List<Comment> replays = new ArrayList<>();
+		while (rs.next()) {
+			Long id = rs.getLong("comment_id");
+			String text = rs.getString("text");
+			LocalDateTime date = DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date"));
+			Long user_id = rs.getLong("user_id");
+			Long video_id = rs.getLong("video_id");
+			// because this is replay there is no replay to this comment!
+			Long replayTo_id = (long) 0;
+			Comment replay = new Comment(id, text, date, user_id, video_id, replayTo_id);
+			replays.add(replay);
+		}
+		ps.close();
+		rs.close();
+		return replays;
+	}
+
+	/**
+	 * 
+	 * @param video
+	 *            - must be with id
+	 * @param withReplays
+	 *            - if true comments and replays sorted by date,else only
+	 *            comments ordered by date
+	 * @return List<Comments>
+	 * @throws VideoException
+	 *             -for invalid id = 0
+	 * @throws SQLException
+	 */
+	public List<Comment> getAllComments(Video video, boolean withReplays) throws VideoException, SQLException {
+		if (video.getVideo_id() == 0) {
+			throw new VideoException(VideoException.INVALID_ID);
+		}
+		String addition = "";
+		if (!withReplays) {
+			addition = "and replay_id is null ";
+		}
+		String sql = "select * from comments where video_id=? " + addition + "order by date;";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setLong(1, video.getVideo_id());
+		ResultSet rs = ps.executeQuery();
+		List<Comment> comments = new ArrayList<>();
+		while (rs.next()) {
+			Long id = rs.getLong("comment_id");
+			String text = rs.getString("text");
+			LocalDateTime date = DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date"));
+			Long user_id = rs.getLong("user_id");
+			Long video_id = rs.getLong("video_id");
+			Long replayTo_id = rs.getLong("replay_id");
+			Comment replay = new Comment(id, text, date, user_id, video_id, replayTo_id);
+			comments.add(replay);
+		}
+		ps.close();
+		rs.close();
+		return comments;
+	}
+
+	/**
+	 * 
+	 * @param user
+	 *            -must be with id
+	 * @param withReplays
+	 *            -if true comments and replays sorted by date,else only
+	 *            comments ordered by date
+	 * @return
+	 * @throws SQLException
+	 * @throws UserException
+	 *             -for invalid id = 0
+	 */
+	public List<Comment> getAllComments(User user, boolean withReplays) throws SQLException, UserException {
+		if (user.getUser_id() == 0) {
+			throw new UserException(UserException.INVALID_ID);
+		}
+		String addition = "";
+		if (!withReplays) {
+			addition = "and replay_id is null ";
+		}
+		String sql = "select * from comments where user_id=? " + addition + "order by date;";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ps.setLong(1, user.getUser_id());
+		ResultSet rs = ps.executeQuery();
+		List<Comment> comments = new ArrayList<>();
+		while (rs.next()) {
+			Long id = rs.getLong("comment_id");
+			String text = rs.getString("text");
+			LocalDateTime date = DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date"));
+			Long user_id = rs.getLong("user_id");
+			Long video_id = rs.getLong("video_id");
+			Long replayTo_id = rs.getLong("replay_id");
+			Comment replay = new Comment(id, text, date, user_id, video_id, replayTo_id);
+			comments.add(replay);
+		}
+		ps.close();
+		rs.close();
+		return comments;
 	}
 
 	/**
@@ -334,17 +464,62 @@ public class CommentDAO {
 		// }
 		/* delete comments for video */
 		/* like dislike video test */
-		User user;
-		try {
-			user = UserDao.getInstance().getUser("Hristo");
-			Comment com = new Comment(1, "alabala", LocalDateTime.now(), null, 2, 1, (long) 0);
-			CommentDAO.getInstance().dislikeComment(com, user);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		} catch (UserNotFoundException e1) {
-			e1.printStackTrace();
-		}
-
+		// User user;
+		// try {
+		// user = UserDao.getInstance().getUser("Hristo");
+		// Comment com = new Comment(1, "alabala", LocalDateTime.now(), 2, 1,
+		// (long) 0);
+		// CommentDAO.getInstance().dislikeComment(com, user);
+		// } catch (SQLException e1) {
+		// e1.printStackTrace();
+		// } catch (UserNotFoundException e1) {
+		// e1.printStackTrace();
+		// } catch (UserException e) {
+		// e.printStackTrace();
+		// }
+		/* replays to comment */
+		// try {
+		// Comment com = new Comment(1, "alabala", LocalDateTime.now(), 2, 1,
+		// (long) 0);
+		// List<Comment> replays = CommentDAO.getInstance().getAllReplays(com);
+		// for (Comment c : replays) {
+		// System.out.println(c.getText());
+		// }
+		// } catch (SQLException e1) {
+		// e1.printStackTrace();
+		// } catch (CommentException e1) {
+		// e1.printStackTrace();
+		// }
+		/* comments to video */
+		// try {
+		// Video v = new Video(1, "", 1, LocalDateTime.now(), "location_url", 1,
+		// "thumbnail_url", "description", 1,
+		// null);
+		// List<Comment> replays = CommentDAO.getInstance().getAllComments(v,
+		// false);
+		// for (Comment c : replays) {
+		// System.out.println(c.getText());
+		// }
+		// } catch (SQLException e1) {
+		// e1.printStackTrace();
+		// } catch (VideoException e) {
+		// e.printStackTrace();
+		// }
+		/* comments from user */
+		// try {
+		// User u =UserDao.getInstance().getUser("Velichko");
+		// List<Comment> replays = CommentDAO.getInstance().getAllComments(u,
+		// false);
+		// for (Comment c : replays) {
+		// System.out.println(c.getText());
+		// }
+		// } catch (SQLException e1) {
+		// e1.printStackTrace();
+		// } catch (UserNotFoundException e) {
+		// e.printStackTrace();
+		// } catch (UserException e) {
+		// e.printStackTrace();
+		// }
 		try {
 			DBConnection.CON1.closeConnection();
 		} catch (SQLException e) {
