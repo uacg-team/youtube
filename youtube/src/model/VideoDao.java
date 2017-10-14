@@ -5,11 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeSet;
 
-import org.apache.tomcat.jni.OS;
 
 import model.exceptions.tags.TagNotFoundException;
 import model.exceptions.user.UserException;
@@ -110,17 +110,19 @@ public class VideoDao {
 		return null;
 	}
 	
-	// NOT OK
+	// OK
 	public boolean existsVideo(Video v) throws SQLException {
-		// FIXME Problem with injection
-		String sql = "SELECT COUNT(*) FROM videos WHERE video_id = ?;";
+		// fixed
+		String sql = "SELECT COUNT(*) FROM videos WHERE video_id=?;";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setLong(1, v.getVideo_id());
-		ResultSet rs = ps.executeQuery(sql);
-		if (rs.next()) {
-			return true;
+		ResultSet rs = ps.executeQuery();
+		//there is always info
+		rs.next();
+		if(rs.getInt(1)==0) {
+			return false;
 		}
-		return false;
+		return true;
 	}
 
 	// TESTING
@@ -144,7 +146,9 @@ public class VideoDao {
 		// UserDao.getInstance().createUser(user);
 		// User u = UserDao.getInstance().getUser("Hristo");
 		// System.out.println(VideoDao.getInstance().getVideos(u));
-
+		/* exist Video test */
+		Video v = new Video(1, "", 1, LocalDateTime.now(), "location_url", 1, "thumbnail_url", "description", 1, null);
+		System.out.println(VideoDao.getInstance().existsVideo(v));
 		System.out.println("Good");
 	}
 
