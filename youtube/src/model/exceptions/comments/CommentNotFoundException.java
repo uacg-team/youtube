@@ -1,6 +1,6 @@
 package model.exceptions.comments;
 
+@SuppressWarnings("serial")
 public class CommentNotFoundException extends CommentException{
-	private static final long serialVersionUID = 1L;
 
 }

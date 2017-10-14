@@ -1,7 +1,6 @@
 package model;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import model.exceptions.comments.CommentException;
 
@@ -9,7 +8,6 @@ public class Comment {
 	private long id;
 	private String text;
 	private LocalDateTime date;
-	private List<Comment> replays;
 	private long user_id;
 	private long video_id;
 	private long replayTo_id;
@@ -17,21 +15,19 @@ public class Comment {
 	/**
 	 * get all fields
 	 */
-	public Comment(long id, String text, LocalDateTime date, List<Comment> replays, long user_id, long video_id,
-			Long replayTo_id) {
+	public Comment(long id, String text, LocalDateTime date, long user_id, long video_id, Long replayTo_id) {
 		this.id = id;
 		this.text = text;
 		this.date = date;
-		this.replays = replays;
 		this.user_id = user_id;
 		this.video_id = video_id;
 		this.replayTo_id = replayTo_id;
 	}
 
 	/**
-	 * register new comment
-	 * use replayTo_id=0 to set not replay
-	 * @throws CommentException 
+	 * register new comment use replayTo_id=0 to set no replay
+	 * 
+	 * @throws CommentException
 	 */
 	public Comment(String text, LocalDateTime date, User user, Video video, Comment replayTo) throws CommentException {
 		setText(text);
@@ -51,10 +47,6 @@ public class Comment {
 
 	public LocalDateTime getDate() {
 		return date;
-	}
-
-	public List<Comment> getReplays() {
-		return replays;
 	}
 
 	public long getUser_id() {
@@ -77,7 +69,9 @@ public class Comment {
 	}
 
 	public void setDate(LocalDateTime date) throws CommentException {
-		if (date == null /*|| date.isAfter(LocalDateTime.now().minusMinutes(1))*/) {
+		if (date == null /*
+							 * || date.isAfter(LocalDateTime.now().minusMinutes(1))
+							 */) {
 			throw new CommentException(CommentException.INVALID_DATE);
 		}
 		this.date = date;
@@ -97,16 +91,22 @@ public class Comment {
 	public void setVideo_id(long video_id) {
 		this.video_id = video_id;
 	}
+
 	/**
 	 * 
-	 * @param replay comment if comment is null replayTo_id=0;
+	 * @param replay
+	 *            comment if comment is null replayTo_id=0;
 	 * @throws CommentException
 	 */
 	public void setReplayTo(Comment replay) throws CommentException {
-		if(replay==null) {
+		if (replay == null) {
 			this.replayTo_id = 0;
 			return;
 		}
 		this.replayTo_id = replay.getId();
+	}
+
+	public void setReplayTo_id(long replayTo_id) {
+		this.replayTo_id = replayTo_id;
 	}
 }
