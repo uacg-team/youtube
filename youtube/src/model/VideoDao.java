@@ -5,11 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeSet;
 
+import org.apache.tomcat.jni.OS;
 
 import model.exceptions.tags.TagNotFoundException;
 import model.exceptions.user.UserException;
@@ -103,13 +103,66 @@ public class VideoDao {
 		return videos;
 	}
 
-	// NOT READY
-	public TreeSet<Video> getAllVideoOrderByLikes() throws SQLException {
-		String sql = "SELECT * FROM videos ORDER BY likes";
+	// OK
+	public HashSet<Video> getAllVideoOrderByLikes() throws SQLException {
+		String sql = "SELECT v.video_id, v.name, v.views, v.date, v.location_url, v.user_id, v.thumbnail_url, v.description, v.privacy_id, SUM(video_likes.isLike) AS likes FROM videos as v JOIN video_likes USING (video_id) GROUP BY video_id ORDER BY SUM(video_likes.isLike) DESC;";
 		PreparedStatement ps = con.prepareStatement(sql);
-		return null;
+		ResultSet rs = ps.executeQuery();
+
+		HashSet<Video> videos = new HashSet<>();
+		while (rs.next()) {
+			videos.add(
+					new Video(
+							rs.getLong("video_id"), 
+							rs.getString("name"), 
+							rs.getInt("views"),
+							DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date")),
+							rs.getString("location_url"), 
+							rs.getLong("user_id"), 
+							rs.getString("thumbnail_url"),
+							rs.getString("description"), 
+							rs.getLong("privacy_id"), 
+							getTags(rs.getString("location_url"))));
+		}
+		return videos;
 	}
 	
+	// OK
+	public HashSet<Video> getAllVideoOrderByDate() throws SQLException {
+		String sql = "SELECT * FROM videos ORDER BY date DESC;";
+		PreparedStatement ps = con.prepareStatement(sql);
+		ResultSet rs = ps.executeQuery();
+
+		HashSet<Video> videos = new HashSet<>();
+		while (rs.next()) {
+			videos.add(
+					new Video(
+							rs.getLong("video_id"), 
+							rs.getString("name"), 
+							rs.getInt("views"),
+							DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date")),
+							rs.getString("location_url"), 
+							rs.getLong("user_id"), 
+							rs.getString("thumbnail_url"),
+							rs.getString("description"), 
+							rs.getLong("privacy_id"), 
+							getTags(rs.getString("location_url"))));
+		}
+		return videos;
+	}
+
+	private HashSet<Tag> getTags(String location_url) throws SQLException {
+		HashSet<Tag> tags = new HashSet<>();
+		String getTags = "SELECT tags.tag FROM videos_has_tags JOIN tags USING (tag_id) JOIN videos ON (videos_has_tags.video_id = videos.video_id) WHERE location_url = ? ;";
+		PreparedStatement ps_tags = con.prepareStatement(getTags);
+		ps_tags.setString(1, location_url);
+		ResultSet rs1 = ps_tags.executeQuery();
+		while (rs1.next()) {
+			tags.add(new Tag(rs1.getString("tag")));
+		}
+		return tags;
+	}
+
 	// OK
 	public boolean existsVideo(Video v) throws SQLException {
 		// fixed
@@ -146,23 +199,12 @@ public class VideoDao {
 		// UserDao.getInstance().createUser(user);
 		// User u = UserDao.getInstance().getUser("Hristo");
 		// System.out.println(VideoDao.getInstance().getVideos(u));
-		/* exist Video test */
-		Video v = new Video(1, "", 1, LocalDateTime.now(), "location_url", 1, "thumbnail_url", "description", 1, null);
-		System.out.println(VideoDao.getInstance().existsVideo(v));
+		System.out.println(VideoDao.getInstance().getAllVideoOrderByLikes());
 		System.out.println("Good");
 	}
 
 	// OK
 	public Video getVideo(String location_url) throws VideoNotFoundException, SQLException {
-		HashSet<Tag> tags = new HashSet<>();
-		String getTags = "SELECT tags.tag FROM videos_has_tags JOIN tags USING (tag_id) JOIN videos ON (videos_has_tags.video_id = videos.video_id) WHERE location_url = ? ;";
-		PreparedStatement ps_tags = con.prepareStatement(getTags);
-		ps_tags.setString(1, location_url);
-		ResultSet rs1 = ps_tags.executeQuery();
-		while (rs1.next()) {
-			tags.add(new Tag(rs1.getString("tag")));
-		}
-
 		String sql = "SELECT * FROM videos WHERE location_url = ?;";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setString(1, location_url);
@@ -172,7 +214,7 @@ public class VideoDao {
 			Video video = new Video(rs.getLong("video_id"), rs.getString("name"), rs.getInt("views"),
 					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date")),
 					rs.getString("location_url"), rs.getLong("user_id"), rs.getString("thumbnail_url"),
-					rs.getString("description"), rs.getLong("privacy_id"), tags);
+					rs.getString("description"), rs.getLong("privacy_id"), getTags(location_url));
 			return video;
 		}
 
