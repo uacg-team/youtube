@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import model.User;
 import model.UserDao;
+import model.exceptions.user.UserException;
 import model.exceptions.user.UserNotFoundException;
 
 /**
@@ -36,6 +37,8 @@ public class LoginServlet extends HttpServlet {
 			response.getWriter().append("SQLException: " + e.getMessage());
 		} catch (UserNotFoundException e) {
 			request.getRequestDispatcher("login.html").forward(request, response);
+		} catch (UserException e) {
+			response.getWriter().append("UserException: " + e.getMessage());
 		}
 	}
 

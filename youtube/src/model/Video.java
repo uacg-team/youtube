@@ -5,6 +5,11 @@ import java.util.HashSet;
 
 import model.exceptions.video.VideoException;
 
+/**
+ * VIDEO POJO Class
+ * @author HP
+ *
+ */
 public class Video {
 
 	private long video_id;
@@ -108,6 +113,10 @@ public class Video {
 
 	public long getPrivacy_id() {
 		return privacy_id;
+	}
+	
+	public HashSet<Tag> getTags() {
+		return tags;
 	}
 
 	public String getThumbnail_url() {

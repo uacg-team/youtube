@@ -11,7 +11,7 @@ import model.utils.Hash;
 /**
  * USER POJO Class
  * 
- * @author Home
+ * @author HP
  *
  */
 public class User {
@@ -19,7 +19,7 @@ public class User {
 	private static final int MIN_FIRST_NAME_LENGTH = 3;
 	private static final int MIN_LAST_NAME_LENGTH = 3;
 	private static final int MIN_USERNAME_LENGTH = 3;
-	private static final int MIN_PASSWORD_LENGTH = 6;
+	private static final int MIN_PASSWORD_LENGTH = 3;
 
 	private long user_id;
 	private String username;
@@ -30,56 +30,46 @@ public class User {
 	private String first_name;
 	private String last_name;
 
-	// all fields
+	/**
+	 * Constructor for creating object user with all the fields e.g. get user from
+	 * database
+	 * 
+	 * @param user_id
+	 * @param username
+	 * @param hashed_password
+	 * @param facebook
+	 * @param email
+	 * @param date_creation
+	 * @param first_name
+	 * @param last_name
+	 * @throws UserException
+	 */
 	public User(long user_id, String username, String hashed_password, String facebook, String email,
-			LocalDateTime date_creation, String first_name, String last_name) {
-		this.user_id = user_id;
-		this.username = username;
-		this.password = hashed_password;
-		this.facebook = facebook;
-		this.email = email;
+			LocalDateTime date_creation, String first_name, String last_name) throws UserException {
+		setUser_id(user_id);
+		setUsername(username);
+		setPassword(hashed_password);
+		setFacebook(facebook);
+		setEmail(email);
 		this.date_creation = date_creation;
-		this.first_name = first_name;
-		this.last_name = last_name;
+		setFirst_name(first_name);
+		setLast_name(last_name);
 	}
 
-	// register user
+	/**
+	 * Constructor for creating object user with all mandatory the fields e.g.
+	 * registering user
+	 * 
+	 * @param username
+	 * @param password
+	 * @param email
+	 * @throws UserException
+	 */
 	public User(String username, String password, String email) throws UserException {
 		setUsername(username);
 		setPassword(password);
 		setEmail(email);
 		this.date_creation = LocalDateTime.now();
-	}
-
-	private void setEmail(String email) throws UserException {
-		try {
-			InternetAddress emailAddr = new InternetAddress(email);
-			emailAddr.validate();
-		} catch (AddressException ex) {
-			throw new UserException(UserException.INVALID_EMAIL);
-		}
-		this.email = email;
-	}
-
-	private void setPassword(String password) throws UserException {
-		if (password == null || password.isEmpty()) {
-			throw new UserException(UserException.INVALID_PASSWORD);
-		}
-		if (password.length() < MIN_PASSWORD_LENGTH) {
-			throw new UserException(UserException.INVALID_PASSWORD_LENGTH);
-		}
-		// TODO: Check for strong password
-		this.password = Hash.getHashPass(password);
-	}
-
-	private void setUsername(String username) throws UserException {
-		if (username == null || username.isEmpty()) {
-			throw new UserException(UserException.INVALID_USERNAME);
-		}
-		if (username.length() < MIN_USERNAME_LENGTH) {
-			throw new UserException(UserException.INVALID_USERNAME_LENGTH);
-		}
-		this.username = username;
 	}
 
 	public LocalDateTime getDate_creation() {
@@ -114,8 +104,23 @@ public class User {
 		return username;
 	}
 
+	private void setEmail(String email) throws UserException {
+		try {
+			InternetAddress emailAddr = new InternetAddress(email);
+			emailAddr.validate();
+		} catch (AddressException ex) {
+			throw new UserException(UserException.INVALID_EMAIL);
+		}
+		this.email = email;
+	}
+
 	public void setFacebook(String facebook) throws UserException {
 		String fbProfileRegex = "((http|https):\\/\\/)?(www[.])?facebook.com\\/.+";
+		if (facebook == null) {
+			this.facebook = facebook;
+			return;
+		}
+
 		if (facebook.matches(fbProfileRegex)) {
 			this.facebook = facebook;
 		}
@@ -123,29 +128,42 @@ public class User {
 	}
 
 	public void setFirst_name(String first_name) throws UserException {
-		if (first_name == null || first_name.isEmpty()) {
-			throw new UserException(UserException.INVALID_NAME);
-		}
-		if (first_name.length() < MIN_FIRST_NAME_LENGTH) {
-			throw new UserException(UserException.INVALID_NAME_LENGTH);
-		}
 		this.first_name = first_name;
 	}
 
 	public void setLast_name(String last_name) throws UserException {
-		if (last_name == null || first_name.isEmpty()) {
-			throw new UserException(UserException.INVALID_NAME);
-		}
-		if (last_name.length() < MIN_LAST_NAME_LENGTH) {
-			throw new UserException(UserException.INVALID_NAME_LENGTH);
-		}
 		this.last_name = last_name;
 	}
 
+	private void setPassword(String password) throws UserException {
+		if (password == null || password.isEmpty()) {
+			throw new UserException(UserException.INVALID_PASSWORD);
+		}
+		if (password.length() < MIN_PASSWORD_LENGTH) {
+			throw new UserException(UserException.INVALID_PASSWORD_LENGTH);
+		}
+		// TODO: Check for strong password
+		if (password.length() == 128) {
+			// already hashed
+			this.password = password;
+		}
+		this.password = Hash.getHashPass(password);
+	}
+
 	public void setUser_id(long user_id) throws UserException {
-		if (user_id<1) {
+		if (user_id < 1) {
 			throw new UserException(UserException.INVALID_ID);
 		}
 		this.user_id = user_id;
+	}
+
+	private void setUsername(String username) throws UserException {
+		if (username == null || username.isEmpty()) {
+			throw new UserException(UserException.INVALID_USERNAME);
+		}
+		if (username.length() < MIN_USERNAME_LENGTH) {
+			throw new UserException(UserException.INVALID_USERNAME_LENGTH);
+		}
+		this.username = username;
 	}
 }

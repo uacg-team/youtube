@@ -10,6 +10,13 @@ public class Tag {
 	private long tag_id;
 	private String tag;
 
+	
+	
+	public Tag(long tag_id, String tag) {
+		this.tag_id = tag_id;
+		this.tag = tag;
+	}
+
 	public Tag(String tag) {
 		this.tag = tag;
 	}
