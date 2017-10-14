@@ -409,9 +409,9 @@ public class CommentDAO {
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setLong(1, c.getId());
 		ResultSet rs = ps.executeQuery();
-		int dislikes = rs.getInt(1);
 		// there is always information
 		rs.next();
+		int dislikes = rs.getInt(1);
 		ps.close();
 		rs.close();
 		return dislikes;
