@@ -69,6 +69,31 @@ public class Video {
 				+ ", description=" + description + ", privacy_id=" + privacy_id + ", tags=" + tags + "]";
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((location_url == null) ? 0 : location_url.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Video other = (Video) obj;
+		if (location_url == null) {
+			if (other.location_url != null)
+				return false;
+		} else if (!location_url.equals(other.location_url))
+			return false;
+		return true;
+	}
 
 	/**
 	 * Use this constructor when uploading new video Creating video
