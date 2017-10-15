@@ -15,6 +15,12 @@ import model.utils.Hash;
  *
  */
 public class User {
+	@Override
+	public String toString() {
+		return "User [user_id=" + user_id + ", username=" + username + ", password=" + password + ", facebook="
+				+ facebook + ", email=" + email + ", date_creation=" + date_creation + ", first_name=" + first_name
+				+ ", last_name=" + last_name + "]";
+	}
 
 	private static final int MIN_FIRST_NAME_LENGTH = 3;
 	private static final int MIN_LAST_NAME_LENGTH = 3;
@@ -143,11 +149,12 @@ public class User {
 			throw new UserException(UserException.INVALID_PASSWORD_LENGTH);
 		}
 		// TODO: Check for strong password
-		if (password.length() == 128) {
+		if (password.length() == 64) {
 			// already hashed
 			this.password = password;
+		} else {
+			this.password = Hash.getHashPass(password);
 		}
-		this.password = Hash.getHashPass(password);
 	}
 
 	public void setUser_id(long user_id) throws UserException {

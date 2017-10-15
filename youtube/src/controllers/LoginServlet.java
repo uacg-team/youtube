@@ -5,14 +5,17 @@ import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import model.User;
 import model.UserDao;
 import model.exceptions.user.UserException;
 import model.exceptions.user.UserNotFoundException;
+import model.utils.Hash;
 
 /**
  * Servlet implementation class LoginServlet
@@ -25,18 +28,30 @@ public class LoginServlet extends HttpServlet {
 			throws ServletException, IOException {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
+
 		
+		request.getSession().invalidate();
 		try {
+			
 			User u = UserDao.getInstance().getUser(username);
-			if (u.getPassword().equals(password)) {
-				request.getRequestDispatcher("home.html").forward(request, response);
+			
+			
+			System.out.println(password);
+			System.out.println(u);
+			
+			
+			
+			if (Hash.equals(password, u.getPassword())) {
+				response.sendRedirect("home.html");
 			} else {
-				request.getRequestDispatcher("login.html").forward(request, response);
+				System.out.println("wrong pass");
+				response.sendRedirect("login.html");
 			}
 		} catch (SQLException e) {
 			response.getWriter().append("SQLException: " + e.getMessage());
 		} catch (UserNotFoundException e) {
-			request.getRequestDispatcher("login.html").forward(request, response);
+			System.out.println("UserNotFoundException");
+			response.sendRedirect("login.html");
 		} catch (UserException e) {
 			response.getWriter().append("UserException: " + e.getMessage());
 		}

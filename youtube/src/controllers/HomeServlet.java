@@ -19,19 +19,23 @@ public class HomeServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		PrintWriter pw = resp.getWriter();
-		pw.println("I am home");
-		HttpSession session = req.getSession();
-		String username = session.getAttribute("username").toString();
-		if (username != null) {
-			pw.println("Username: " + username);
+		if ((boolean) req.getSession().getAttribute("logged")) {
+			PrintWriter pw = resp.getWriter();
+			pw.println("I am home");
+			HttpSession session = req.getSession();
+			String username = session.getAttribute("username").toString();
+			if (username != null) {
+				pw.println("Username: " + username);
+			}
+			pw.print("html...");
+
+			session.invalidate();
+
+			req.getRequestDispatcher("home.html").forward(req, resp);
+		}else {
+			resp.sendRedirect("index.html");
 		}
-
-		pw.print("html...");
-
-		session.invalidate();
-
-		req.getRequestDispatcher("home.html").forward(req, resp);
+		
 	}
 
 }

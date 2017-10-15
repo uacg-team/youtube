@@ -148,7 +148,6 @@ public class UserDao {
 					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date_creation")),
 					rs.getString("first_name"), 
 					rs.getString("last_name"));
-
 		}
 		throw new UserNotFoundException();
 	}
