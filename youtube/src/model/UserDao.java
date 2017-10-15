@@ -6,11 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import model.exceptions.user.UserException;
 import model.exceptions.user.UserNotFoundException;
 import model.utils.DBConnection;
 import model.utils.DateTimeConvertor;
+import model.utils.Hash;
 
 /**
  * User Data Access Object
@@ -49,6 +51,10 @@ public class UserDao {
 		// User u2 = UserDao.getInstance().getUser("Velichko");
 		// UserDao.getInstance().followUnfollowUser(u1, u2);
 		//System.out.println(UserDao.getInstance().loginUser(new User("Hristo", "Penev", "hristo@penev.bg")));
+		
+		// User u1 = UserDao.getInstance().getUser("Hristo");
+		// System.out.println(UserDao.getInstance().getFollowing(u1));
+		
 		System.out.println("Excelent");
 	}
 
@@ -190,6 +196,52 @@ public class UserDao {
 		ps.setLong(1, user.getUser_id());
 		ps.setLong(2, following.getUser_id());
 		ps.executeUpdate();
+	}
+	
+	// OK
+	public HashSet<User> getFollowers(User u) throws SQLException, UserNotFoundException, UserException {
+		String unfollow = "SELECT users.* FROM users_follow_users AS follower JOIN users ON (follower.follower_id = users.user_id) WHERE follower.user_id = ?;";
+		PreparedStatement ps = con.prepareStatement(unfollow);
+		ps.setLong(1, u.getUser_id());
+		ResultSet rs = ps.executeQuery();
+		HashSet<User> followers = new HashSet<>();
+		while (rs.next()) {
+			followers.add(
+				new User(
+					rs.getLong("user_id"), 
+					rs.getString("username"), 
+					rs.getString("password"),
+					rs.getString("facebook"), 
+					rs.getString("email"),
+					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date_creation")),
+					rs.getString("first_name"), 
+					rs.getString("last_name")));
+		}
+		
+		return followers;
+	}
+
+	// OK
+	public HashSet<User> getFollowing(User u) throws SQLException, UserNotFoundException, UserException {
+		String unfollow = "SELECT users.* FROM users_follow_users AS follower JOIN users ON (follower.user_id = users.user_id) WHERE follower.follower_id = ?;";
+		PreparedStatement ps = con.prepareStatement(unfollow);
+		ps.setLong(1, u.getUser_id());
+		ResultSet rs = ps.executeQuery();
+		HashSet<User> following = new HashSet<>();
+		while (rs.next()) {
+			following.add(
+				new User(
+					rs.getLong("user_id"), 
+					rs.getString("username"), 
+					rs.getString("password"),
+					rs.getString("facebook"), 
+					rs.getString("email"),
+					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date_creation")),
+					rs.getString("first_name"), 
+					rs.getString("last_name")));
+		}
+		
+		return following;
 	}
 
 }

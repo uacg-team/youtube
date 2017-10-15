@@ -1,11 +1,14 @@
 package model;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import model.exceptions.user.UserException;
+import model.exceptions.user.UserNotFoundException;
 import model.utils.Hash;
 
 /**
@@ -19,11 +22,9 @@ public class User {
 	public String toString() {
 		return "User [user_id=" + user_id + ", username=" + username + ", password=" + password + ", facebook="
 				+ facebook + ", email=" + email + ", date_creation=" + date_creation + ", first_name=" + first_name
-				+ ", last_name=" + last_name + "]";
+				+ ", last_name=" + last_name + "]\n";
 	}
 
-	private static final int MIN_FIRST_NAME_LENGTH = 3;
-	private static final int MIN_LAST_NAME_LENGTH = 3;
 	private static final int MIN_USERNAME_LENGTH = 3;
 	private static final int MIN_PASSWORD_LENGTH = 3;
 
@@ -35,6 +36,9 @@ public class User {
 	private LocalDateTime date_creation;
 	private String first_name;
 	private String last_name;
+
+	private HashSet<User> followers;
+	private HashSet<User> following;
 
 	/**
 	 * Constructor for creating object user with all the fields e.g. get user from
@@ -108,6 +112,14 @@ public class User {
 
 	public String getUsername() {
 		return username;
+	}
+
+	public HashSet<User> getFollowers() throws SQLException, UserNotFoundException, UserException {
+		return UserDao.getInstance().getFollowers(this);
+	}
+
+	public HashSet<User> getFollowing() throws SQLException, UserNotFoundException, UserException {
+		return UserDao.getInstance().getFollowing(this);
 	}
 
 	private void setEmail(String email) throws UserException {
