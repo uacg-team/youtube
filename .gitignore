@@ -24,8 +24,9 @@
 Servers/
 
 #sensitive information
-DBConnection.java
-SendEmail.java
+./youtube/src/model/utils/DBConnection.java
+./youtube/src/model/utils/SendEmail.java
+
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
