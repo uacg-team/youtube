@@ -27,21 +27,11 @@ public class LoginServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String username = request.getParameter("username");
-		String password = request.getParameter("password");
-
-		
-		request.getSession().invalidate();
+		String password = Hash.getHashPass(request.getParameter("password"));
 		try {
-			
 			User u = UserDao.getInstance().getUser(username);
-			
-			
-			System.out.println(password);
-			System.out.println(u);
-			
-			
-			
-			if (Hash.equals(password, u.getPassword())) {
+			if (password.equals(u.getPassword())) {
+				request.getSession().setAttribute("user", u);
 				response.sendRedirect("home.html");
 			} else {
 				System.out.println("wrong pass");

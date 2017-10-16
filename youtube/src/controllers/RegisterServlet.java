@@ -38,7 +38,7 @@ public class RegisterServlet extends HttpServlet {
 		}
 
 		try {
-			if (UserDao.getInstance().existsUser(u)) {
+			if (UserDao.getInstance().existsUser(u.getUsername())) {
 				response.getWriter().append("user with email ").append(u.getEmail()).append(" exists");
 			} else {
 				UserDao.getInstance().createUser(u);

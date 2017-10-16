@@ -32,10 +32,10 @@ public class HomeServlet extends HttpServlet {
 			session.invalidate();
 
 			req.getRequestDispatcher("home.html").forward(req, resp);
-		}else {
+		} else {
 			resp.sendRedirect("index.html");
 		}
-		
+
 	}
 
 }
