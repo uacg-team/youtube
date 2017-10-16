@@ -54,92 +54,73 @@ public class PlaylistDAO {
 
 	// not tested
 	/**
+	 * Update only name for playlist
+	 * 
 	 * @param playlist
 	 *            - must contain playlist_id
-	 * @param updateVideosInDB
-	 *            -if true <b>delete all videos for this playlist and write all
-	 *            videos loaded in Playlist videos collection</b>,else update
-	 *            only playlist name and user_id
 	 * @throws PlaylistException
 	 *             - playlist id is default
 	 * @throws SQLException
 	 */
-	public void updatePlaylist(Playlist playlist, boolean updateVideosInDB) throws PlaylistException, SQLException {
+	public void updatePlaylist(Playlist playlist) throws PlaylistException, SQLException {
 		if (playlist.getUser_id() == 0) {
 			throw new PlaylistException(PlaylistException.INVALID_ID);
 		}
 		// update playlist info
 		String sql = "update playlists set playlist_name=?,user_id=? where playlist_id=?;";
-		PreparedStatement ps = con.prepareStatement(sql);
-		ps.setString(1, playlist.getName());
-		ps.setLong(2, playlist.getUser_id());
-		ps.setLong(3, playlist.getId());
-		ps.executeUpdate();
-		ps.close();
-		// update playlist videos
-		if (updateVideosInDB) {
-			deleteVideosInPlaylistDB(playlist);
-			sql = "insert into playlists_has_videos (playlist_id,video_id) values (?,?);";
-			List<Video> videos = playlist.getVideos();
-			for (Video v : videos) {
-				ps = con.prepareStatement(sql);
-				ps.setLong(1, playlist.getId());
-				ps.setLong(2, v.getVideo_id());
-				ps.executeUpdate();
-				ps.close();
-			}
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setString(1, playlist.getName());
+			ps.setLong(2, playlist.getUser_id());
+			ps.setLong(3, playlist.getId());
+			ps.executeUpdate();
 		}
 	}
 
 	/**
-	 * @param playlist
-	 *            must have playlist_id
+	 * @param playlist_id
 	 * @throws PlaylistException
 	 *             - if playlist have no id
 	 * @throws SQLException
 	 */
-	public void deletePlaylist(Playlist playlist) throws PlaylistException, SQLException {
+	public void deletePlaylist(long playlist_id) throws PlaylistException, SQLException {
 		// delete videos in playlist
-		deleteVideosInPlaylistDB(playlist);
+		deleteVideosInPlaylistDB(playlist_id);
 		// delete playlist
 		String sql = "delete from playlists where playlist_id=?;";
-		PreparedStatement ps = con.prepareStatement(sql);
-		ps.setLong(1, playlist.getId());
-		ps.executeUpdate();
-		ps.close();
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, playlist_id);
+			ps.executeUpdate();
+		}
 	}
 
 	// not tested
 	/**
-	 * @param user
-	 *            must have user_id
+	 * @param user_id
 	 * @return arraylist with playlists without loaded videos in it
 	 * @throws UserException
 	 *             if user_id missing
 	 * @throws SQLException
 	 */
-	public List<Playlist> getPlaylists(User user) throws UserException, SQLException {
-		if (user.getUser_id() == 0) {
-			throw new UserException(UserException.INVALID_ID);
-		}
+	public List<Playlist> getPlaylists(long user_id) throws UserException, SQLException {
 		List<Playlist> playlists = new ArrayList<>();
 		String sql = "select * from playlists where user_id=?;";
-		PreparedStatement ps = con.prepareStatement(sql);
-		ps.setLong(1, user.getUser_id());
-		ResultSet rs = ps.executeQuery();
-		while (rs.next()) {
-			long playlist_id = rs.getLong("playlist_id");
-			String playlist_name = rs.getString("playlist_name");
-			Playlist playlist = new Playlist(playlist_id, playlist_name, user.getUser_id());
-			playlists.add(playlist);
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, user_id);
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					long playlist_id = rs.getLong("playlist_id");
+					String playlist_name = rs.getString("playlist_name");
+					Playlist playlist = new Playlist(playlist_id, playlist_name, user_id);
+					playlists.add(playlist);
+				}
+				return playlists;
+			}
 		}
-		return playlists;
 	}
 
 	// not tested
 	/**
-	 * @param user
-	 *            -must have id
+	 * @param user_id
 	 * @param playlistName
 	 *            not null and not empty;
 	 * @return playlist if exist playlist for user with playlistName ignoreCase
@@ -150,11 +131,12 @@ public class PlaylistDAO {
 	 * @throws PlaylistException
 	 *             -if playlistName is null or empty
 	 */
-	public Playlist getPlaylist(User user, String playlistName) throws UserException, SQLException, PlaylistException {
+	public Playlist getPlaylist(long user_id, String playlistName)
+			throws UserException, SQLException, PlaylistException {
 		if (playlistName == null || playlistName.isEmpty()) {
 			throw new PlaylistException(PlaylistException.INVALID_NAME);
 		}
-		List<Playlist> playslist = getPlaylists(user);
+		List<Playlist> playslist = getPlaylists(user_id);
 		for (Playlist p : playslist) {
 			if (p.getName().equalsIgnoreCase(playlistName)) {
 				return p;
@@ -162,9 +144,12 @@ public class PlaylistDAO {
 		}
 		return null;
 	}
+
 	/**
-	 * @param playlist -must have playlist_id
-	 * @throws PlaylistException - if playlist_id is 0
+	 * @param playlist
+	 *            must contain real id,load videos in this playlist
+	 * @throws PlaylistException
+	 *             - if playlist_id is 0
 	 * @throws SQLException
 	 */
 	public void loadVideosInPlaylist(Playlist playlist) throws PlaylistException, SQLException {
@@ -174,44 +159,62 @@ public class PlaylistDAO {
 		String sql = "select * from videos as v inner join "
 				+ "(select * from playlists_has_videos where playlist_id=?) as p" + " on(v.video_id=p.video_id);";
 		List<Video> videos = new ArrayList<>();
-		PreparedStatement ps = con.prepareStatement(sql);
-		ps.setLong(1, playlist.getId());
-		ResultSet rs = ps.executeQuery();
-		while (rs.next()) {
-			long video_id = rs.getLong("video_id");
-			String name = rs.getString("name");
-			int views = rs.getInt("views");
-			LocalDateTime date = DateTimeConvertor.sqlToLdt(rs.getString("date"));
-			String location_url = rs.getString("location_url");
-			long user_id = rs.getLong("user_id");
-			String thumbnail_url = rs.getString("thumbnail_url");
-			String description = rs.getString("description");
-			long privacy_id = rs.getLong("privacy_id");
-
-			// TODO get tags and set
-
-			Video video = new Video(video_id, name, views, date, location_url, user_id, thumbnail_url, description,
-					privacy_id, null);
-			videos.add(video);
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, playlist.getId());
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					long video_id = rs.getLong("video_id");
+					String name = rs.getString("name");
+					int views = rs.getInt("views");
+					LocalDateTime date = DateTimeConvertor.sqlToLdt(rs.getString("date"));
+					String location_url = rs.getString("location_url");
+					long user_id = rs.getLong("user_id");
+					String thumbnail_url = rs.getString("thumbnail_url");
+					String description = rs.getString("description");
+					long privacy_id = rs.getLong("privacy_id");
+					// tags for video, not loaded!
+					Video video = new Video(video_id, name, views, date, location_url, user_id, thumbnail_url,
+							description, privacy_id, null);
+					videos.add(video);
+				}
+				playlist.setVideos(videos);
+			}
 		}
-
-		playlist.setVideos(videos);
 	}
 
 	/**
-	 * @param playlist
-	 *            must have playlist_id
+	 * @param playlist_id
 	 * @throws PlaylistException
 	 * @throws SQLException
 	 */
-	private void deleteVideosInPlaylistDB(Playlist playlist) throws PlaylistException, SQLException {
-		if (playlist.getId() == 0) {
-			throw new PlaylistException(PlaylistException.INVALID_ID);
-		}
+	private void deleteVideosInPlaylistDB(long playlist_id) throws PlaylistException, SQLException {
 		String sql = "delete from playlists_has_videos where playlist_id = ?;";
-		PreparedStatement ps = con.prepareStatement(sql);
-		ps.setLong(1, playlist.getId());
-		ps.executeUpdate();
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, playlist_id);
+			ps.executeUpdate();
+		}
+	}
+
+	public void addVideo(Playlist playlist, Video video) {
+		// TODO add video in DB for this playlist
+		// Add only public video
+	}
+
+	public void removeVideo(Playlist playlist, Video video) {
+		// TODO add video in DB for this playlist
+	}
+
+	public List<Playlist> getPlaylists() {
+		// TODO
+		return null;
+	}
+
+	public List<Playlist> searchPlaylist(String search) {
+		// TODO ignore case in db
+
+		// String sql = "select * from playlists where playlists.`playlist_name`
+		// COLLATE UTF8_GENERAL_CI LIKE '%?%'";
+		return null;
 	}
 
 	// Test

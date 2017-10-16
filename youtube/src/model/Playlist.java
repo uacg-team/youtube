@@ -16,32 +16,34 @@ public class Playlist {
 	private long playlist_id;
 	private String playlist_name;
 	private long user_id;
+	private boolean isLoaded;
 
 	private List<Video> videos;
 
 	/**
 	 * get from DB , for loading videos use PlaylistDAO -loadVideosInPlaylist
 	 */
-	public Playlist(long playlist_id, String playlist_name, long user_id) {
+	Playlist(long playlist_id, String playlist_name, long user_id) {
 		this.playlist_id = playlist_id;
 		this.playlist_name = playlist_name;
 		this.user_id = user_id;
 		this.videos = new ArrayList<>();
+		isLoaded = false;
 	}
 
 	/**
 	 * @param name
-	 *            - new playlist name
-	 * @param user
-	 *            -user with id
+	 *            - playlist name
+	 * @param user_id
 	 * @throws PlaylistException
 	 *             -not valid name and user
 	 */
-	public Playlist(String name, User user) throws PlaylistException {
+	public Playlist(String name, long user_id) throws PlaylistException {
 		this.playlist_id = (long) 0;
 		setName(name);
 		setUser_id(user_id);
 		this.videos = new ArrayList<>();
+		isLoaded = false;
 	}
 
 	public long getId() {
@@ -86,25 +88,50 @@ public class Playlist {
 		this.user_id = user_id;
 	}
 
+	/**
+	 * <b>Always use with PlaylistDAO addVideo.Before use check for videos
+	 * loaded in playlist</b>
+	 * 
+	 * @param video
+	 * @throws PlaylistException-VIDEOS_NOT_LOADED,VIDEO_AREADY_EXIST
+	 * @throws VideoException-INVALID_ID
+	 */
 	public void addVideo(Video video) throws PlaylistException, VideoException {
 		if (video == null || video.getVideo_id() == 0) {
 			throw new VideoException(VideoException.INVALID_ID);
 		}
+		if (!isLoaded) {
+			throw new PlaylistException(PlaylistException.VIDEOS_NOT_LOADED);
+		}
 		if (videos.contains(video)) {
 			throw new PlaylistException(PlaylistException.VIDEO_AREADY_EXIST);
 		}
+		//TODO add only public video
 		videos.add(video);
 	}
 
-	public void removeVideo(Video video) throws VideoException {
+	/**
+	 * <b>Always use with PlaylistDAO addVideo.Before use check for videos
+	 * loaded in playlist</b>
+	 * 
+	 * @param video
+	 * @throws VideoException-INVALID_ID,
+	 * @throws VideoNotFoundException NOT_FOUND
+	 * @throws PlaylistException VIDEOS_NOT_LOADED
+	 */
+	public void removeVideo(Video video) throws VideoException, VideoNotFoundException, PlaylistException {
 		if (video == null || video.getVideo_id() == 0) {
 			throw new VideoException(VideoException.INVALID_ID);
+		}
+		if (!isLoaded) {
+			throw new PlaylistException(PlaylistException.VIDEOS_NOT_LOADED);
 		}
 		if (videos.contains(video)) {
 			throw new VideoNotFoundException(VideoNotFoundException.NOT_FOUND);
 		}
 		videos.remove(video);
 	}
+
 	/**
 	 * @return unmodifiableList(videos)
 	 */
@@ -114,6 +141,10 @@ public class Playlist {
 
 	void setVideos(List<Video> videos) {
 		this.videos = videos;
+	}
+
+	public boolean isLoaded() {
+		return isLoaded;
 	}
 
 	@Override
@@ -126,18 +157,6 @@ public class Playlist {
 			return false;
 		Playlist other = (Playlist) obj;
 		if (playlist_id != other.playlist_id)
-			return false;
-		if (playlist_name == null) {
-			if (other.playlist_name != null)
-				return false;
-		} else if (!playlist_name.equals(other.playlist_name))
-			return false;
-		if (user_id != other.user_id)
-			return false;
-		if (videos == null) {
-			if (other.videos != null)
-				return false;
-		} else if (!videos.equals(other.videos))
 			return false;
 		return true;
 	}
