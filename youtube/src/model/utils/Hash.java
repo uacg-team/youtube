@@ -14,8 +14,4 @@ public final class Hash {
 		byte[] hashBytes = coder.digest(bytes);
 		return Hex.toHexString(hashBytes);
 	}
-	
-	public static boolean equals(String password, String hashedPassword) {
-		return getHashPass(password).equals(hashedPassword);
-	}
 }
