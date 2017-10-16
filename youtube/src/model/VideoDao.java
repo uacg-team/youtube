@@ -51,7 +51,7 @@ public class VideoDao {
 		PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 		ps.setString(1, v.getName());
 		ps.setInt(2, v.getViews());
-		String date = DateTimeConvertor.fromLocalDateTimeToSqlDateTime(v.getDate());
+		String date = DateTimeConvertor.ldtToSql(v.getDate());
 		ps.setString(3, date);
 		ps.setString(4, v.getLocation_url());
 		ps.setLong(5, v.getUser_id());
@@ -134,7 +134,7 @@ public class VideoDao {
 		HashSet<Video> videos = new HashSet<>();
 		while (rs.next()) {
 			videos.add(new Video(rs.getLong("video_id"), rs.getString("name"), rs.getInt("views"),
-					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date")),
+					DateTimeConvertor.sqlToLdt(rs.getString("date")),
 					rs.getString("location_url"), rs.getLong("user_id"), rs.getString("thumbnail_url"),
 					rs.getString("description"), rs.getLong("privacy_id"), getTags(rs.getString("location_url"))));
 		}
@@ -154,7 +154,7 @@ public class VideoDao {
 		HashSet<Video> videos = new HashSet<>();
 		while (rs.next()) {
 			videos.add(new Video(rs.getLong("video_id"), rs.getString("name"), rs.getInt("views"),
-					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date")),
+					DateTimeConvertor.sqlToLdt(rs.getString("date")),
 					rs.getString("location_url"), rs.getLong("user_id"), rs.getString("thumbnail_url"),
 					rs.getString("description"), rs.getLong("privacy_id"), getTags(rs.getString("location_url"))));
 		}
@@ -230,7 +230,7 @@ public class VideoDao {
 
 		if (rs.next()) {
 			Video video = new Video(rs.getLong("video_id"), rs.getString("name"), rs.getInt("views"),
-					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date")),
+					DateTimeConvertor.sqlToLdt(rs.getString("date")),
 					rs.getString("location_url"), rs.getLong("user_id"), rs.getString("thumbnail_url"),
 					rs.getString("description"), rs.getLong("privacy_id"), getTags(location_url));
 			return video;
@@ -259,7 +259,7 @@ public class VideoDao {
 			}
 
 			allUserVideos.add(new Video(rs.getLong("video_id"), rs.getString("name"), rs.getInt("views"),
-					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date")),
+					DateTimeConvertor.sqlToLdt(rs.getString("date")),
 					rs.getString("location_url"), rs.getLong("user_id"), rs.getString("thumbnail_url"),
 					rs.getString("description"), rs.getLong("privacy_id"), tags));
 		}

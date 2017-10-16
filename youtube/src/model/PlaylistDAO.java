@@ -181,7 +181,7 @@ public class PlaylistDAO {
 			long video_id = rs.getLong("video_id");
 			String name = rs.getString("name");
 			int views = rs.getInt("views");
-			LocalDateTime date = DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date"));
+			LocalDateTime date = DateTimeConvertor.sqlToLdt(rs.getString("date"));
 			String location_url = rs.getString("location_url");
 			long user_id = rs.getLong("user_id");
 			String thumbnail_url = rs.getString("thumbnail_url");

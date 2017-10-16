@@ -40,7 +40,7 @@ public class CommentDAO {
 		String sql = "insert into comments (text, date,video_id, user_id, replay_id) values(?,?,?,?,?)";
 		PreparedStatement ps = con.prepareStatement(sql);
 		ps.setString(1, c.getText());
-		ps.setString(2, DateTimeConvertor.fromLocalDateTimeToSqlDateTime(c.getDate()));
+		ps.setString(2, DateTimeConvertor.ldtToSql(c.getDate()));
 		ps.setLong(3, c.getVideo_id());
 		ps.setLong(4, c.getUser_id());
 		if (c.getReplayTo_id() != 0) {
@@ -83,7 +83,7 @@ public class CommentDAO {
 				+ c.getId();
 		ps = con.prepareStatement(sql);
 		ps.setString(1, c.getText());
-		ps.setString(2, DateTimeConvertor.fromLocalDateTimeToSqlDateTime(c.getDate()));
+		ps.setString(2, DateTimeConvertor.ldtToSql(c.getDate()));
 		ps.setLong(3, c.getVideo_id());
 		ps.setLong(4, c.getUser_id());
 		if (c.getReplayTo_id() != 0) {
@@ -286,7 +286,7 @@ public class CommentDAO {
 		while (rs.next()) {
 			Long id = rs.getLong("comment_id");
 			String text = rs.getString("text");
-			LocalDateTime date = DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date"));
+			LocalDateTime date = DateTimeConvertor.sqlToLdt(rs.getString("date"));
 			Long user_id = rs.getLong("user_id");
 			Long video_id = rs.getLong("video_id");
 			// because this is replay there is no replay to this comment!
@@ -327,7 +327,7 @@ public class CommentDAO {
 		while (rs.next()) {
 			Long id = rs.getLong("comment_id");
 			String text = rs.getString("text");
-			LocalDateTime date = DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date"));
+			LocalDateTime date = DateTimeConvertor.sqlToLdt(rs.getString("date"));
 			Long user_id = rs.getLong("user_id");
 			Long video_id = rs.getLong("video_id");
 			Long replayTo_id = rs.getLong("replay_id");
@@ -367,7 +367,7 @@ public class CommentDAO {
 		while (rs.next()) {
 			Long id = rs.getLong("comment_id");
 			String text = rs.getString("text");
-			LocalDateTime date = DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date"));
+			LocalDateTime date = DateTimeConvertor.sqlToLdt(rs.getString("date"));
 			Long user_id = rs.getLong("user_id");
 			Long video_id = rs.getLong("video_id");
 			Long replayTo_id = rs.getLong("replay_id");

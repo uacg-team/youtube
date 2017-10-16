@@ -65,7 +65,7 @@ public class UserDao {
 		ps.setString(1, u.getUsername());
 		ps.setString(2, u.getPassword());
 		ps.setString(3, u.getEmail());
-		ps.setString(4, DateTimeConvertor.fromLocalDateTimeToSqlDateTime(u.getDate_creation()));
+		ps.setString(4, DateTimeConvertor.ldtToSql(u.getDate_creation()));
 		ps.executeUpdate();
 	}
 		
@@ -98,7 +98,7 @@ public class UserDao {
 					rs.getString("password"), 
 					rs.getString("facebook"), 
 					rs.getString("email"), 
-					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date_creation")),
+					DateTimeConvertor.sqlToLdt(rs.getString("date_creation")),
 					rs.getString("first_name"), 
 					rs.getString("last_name")));
 		}
@@ -151,7 +151,7 @@ public class UserDao {
 					rs.getString("password"),
 					rs.getString("facebook"), 
 					rs.getString("email"),
-					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date_creation")),
+					DateTimeConvertor.sqlToLdt(rs.getString("date_creation")),
 					rs.getString("first_name"), 
 					rs.getString("last_name"));
 		}
@@ -213,7 +213,7 @@ public class UserDao {
 					rs.getString("password"),
 					rs.getString("facebook"), 
 					rs.getString("email"),
-					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date_creation")),
+					DateTimeConvertor.sqlToLdt(rs.getString("date_creation")),
 					rs.getString("first_name"), 
 					rs.getString("last_name")));
 		}
@@ -236,7 +236,7 @@ public class UserDao {
 					rs.getString("password"),
 					rs.getString("facebook"), 
 					rs.getString("email"),
-					DateTimeConvertor.fromSqlDateTimeToLocalDateTime(rs.getString("date_creation")),
+					DateTimeConvertor.sqlToLdt(rs.getString("date_creation")),
 					rs.getString("first_name"), 
 					rs.getString("last_name")));
 		}

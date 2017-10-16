@@ -14,14 +14,14 @@ public class DateTimeConvertor {
 	 * @return String with pattern 2017-10-12 15:16:56 ready to parse to mysql
 	 * to parse use STR_TO_DATE('2017-10-12 15:16:56','%Y-%m-%d %H:%i:%s.%f')
 	 */
-	public static String fromLocalDateTimeToSqlDateTime(LocalDateTime localDateTime) {
+	public static String ldtToSql(LocalDateTime localDateTime) {
 		return localDateTime.format(FORMAT);
 	}
 	/**
 	 * @param sqlDateTime- 
 	 * @return LocalDateTime
 	 */
-	public static LocalDateTime fromSqlDateTimeToLocalDateTime(String sqlDateTime) {
+	public static LocalDateTime sqlToLdt(String sqlDateTime) {
 		return LocalDateTime.parse(sqlDateTime, FORMAT);
 	}
 
@@ -29,7 +29,7 @@ public class DateTimeConvertor {
 		Connection con = DBConnection.CON1.getConnection();
 		//Demo insert date
 		PreparedStatement ps = con.prepareStatement("update videos set date=STR_TO_DATE(?,'%Y-%m-%d %H:%i:%s.%f') where id=1;");
-		ps.setString(1, fromLocalDateTimeToSqlDateTime(LocalDateTime.now()));
+		ps.setString(1, ldtToSql(LocalDateTime.now()));
 		ps.executeUpdate();
 		//Demo get date
 		ps=con.prepareStatement("select date from videos where id=1;");
@@ -37,7 +37,7 @@ public class DateTimeConvertor {
 		rs.next();
 		String s = rs.getString(1);
 		DBConnection.CON1.closeConnection();
-		System.out.println(fromSqlDateTimeToLocalDateTime(s));
+		System.out.println(sqlToLdt(s));
 		System.out.println(s);
 	}
 }
