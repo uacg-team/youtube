@@ -10,31 +10,31 @@ public class Comment {
 	private LocalDateTime date;
 	private long user_id;
 	private long video_id;
-	private long replayTo_id;
+	private long replay_id;
 
 	/**
 	 * get all fields
+	 * default, use only by CommentDAO
 	 */
-	public Comment(long id, String text, LocalDateTime date, long user_id, long video_id, Long replayTo_id) {
+	Comment(long id, String text, LocalDateTime date, long user_id, long video_id, Long replay_id) {
 		this.id = id;
 		this.text = text;
 		this.date = date;
 		this.user_id = user_id;
 		this.video_id = video_id;
-		this.replayTo_id = replayTo_id;
+		this.replay_id = replay_id;
 	}
 
 	/**
 	 * register new comment use replayTo_id=0 to set no replay
-	 * 
 	 * @throws CommentException
 	 */
-	public Comment(String text, LocalDateTime date, User user, Video video, Comment replayTo) throws CommentException {
+	public Comment(String text, LocalDateTime date, long user_id, long video_id, long replay_id) throws CommentException {
 		setText(text);
 		setDate(date);
-		setUser_id(user.getUser_id());
-		setVideo_id(video.getVideo_id());
-		setReplayTo(replayTo);
+		setUser_id(user_id);
+		setVideo_id(video_id);
+		setReplay_id(replay_id);
 	}
 
 	public long getId() {
@@ -58,7 +58,7 @@ public class Comment {
 	}
 
 	public long getReplayTo_id() {
-		return replayTo_id;
+		return replay_id;
 	}
 
 	public void setId(long id) throws CommentException {
@@ -85,28 +85,16 @@ public class Comment {
 	}
 
 	public void setUser_id(long user_id) {
+		//user_id validate in other place
 		this.user_id = user_id;
 	}
 
 	public void setVideo_id(long video_id) {
+		//video_id validate in other place
 		this.video_id = video_id;
 	}
 
-	/**
-	 * 
-	 * @param replay
-	 *            comment if comment is null replayTo_id=0;
-	 * @throws CommentException
-	 */
-	public void setReplayTo(Comment replay) throws CommentException {
-		if (replay == null) {
-			this.replayTo_id = 0;
-			return;
-		}
-		this.replayTo_id = replay.getId();
-	}
-
-	public void setReplayTo_id(long replayTo_id) {
-		this.replayTo_id = replayTo_id;
+	public void setReplay_id(long replay_id) {
+		this.replay_id = replay_id;
 	}
 }
