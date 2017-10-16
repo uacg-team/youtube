@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
+import java.util.List;
 
 import model.exceptions.tags.TagNotFoundException;
 import model.utils.DBConnection;
@@ -17,33 +17,29 @@ import model.utils.DBConnection;
 
 public class TagDao {
 	private static TagDao instance;
-	private static Connection con = DBConnection.CON1.getConnection();
+	private static final Connection con = DBConnection.CON1.getConnection();
+
+	static {
+		instance = new TagDao();
+	}
 
 	private TagDao() {
 	}
 
-	public static synchronized TagDao getInstance() {
-		if (instance == null) {
-			instance = new TagDao();
-		}
+	public static TagDao getInstance() {
 		return instance;
 	}
 
-	public static void main(String[] args) throws SQLException {
-		System.out.println(TagDao.getInstance().existTag(new Tag("tag1")));
-		System.out.println("excellent");
-	}
-
-	// OK
-	public boolean existTag(Tag t) throws SQLException {
+	public boolean existTag(String tag) throws SQLException {
 		String sql = "SELECT tag FROM tags WHERE tag = ?";
-		PreparedStatement ps = con.prepareStatement(sql);
-		ps.setString(1, t.getTag());
-		ResultSet rs = ps.executeQuery();
-		if (rs.next()) {
-			return true;
+		try (PreparedStatement ps = con.prepareStatement(sql);) {
+			ps.setString(1, tag);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				return true;
+			}
+			return false;
 		}
-		return false;
 	}
 
 	public Tag getTag(String tag) throws SQLException, TagNotFoundException {
@@ -52,18 +48,20 @@ public class TagDao {
 		ps.setString(1, tag);
 		ResultSet rs = ps.executeQuery();
 		if (rs.next()) {
-			return new Tag(rs.getLong("tag_id"), rs.getString("tag"));
+			return new Tag(
+					rs.getLong("tag_id"), 
+					rs.getString("tag"));
 		}
 		throw new TagNotFoundException();
 	}
 
 	public void insertVideoTags(Video v) throws SQLException, TagNotFoundException {
-		HashSet<Tag> tags = v.getTags();
+		List<Tag> tags = v.getTags();
 		
 		String insert_into_videos_has_tags = "INSERT INTO videos_has_tags (video_id, tag_id) values (?, ?)";
 
 		for (Tag tag : tags) {
-			insertTag(tag);
+			insertTag(tag.getTag());
 			tag = getTag(tag.getTag());
 			
 			PreparedStatement videos_has_tags = con.prepareStatement(insert_into_videos_has_tags);
@@ -73,11 +71,11 @@ public class TagDao {
 		}
 	}
 
-	public void insertTag(Tag t) throws SQLException {
-		if (!existTag(t)) {
+	public void insertTag(String tag) throws SQLException {
+		if (!existTag(tag)) {
 			String insertTags = "INSERT INTO tags (tag) values (?)";
 			PreparedStatement ps = con.prepareStatement(insertTags);
-			ps.setString(1, t.getTag());
+			ps.setString(1, tag);
 			ps.executeUpdate();
 		}
 	}

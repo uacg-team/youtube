@@ -1,17 +1,21 @@
 package model;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 
+import model.exceptions.user.UserException;
 import model.exceptions.video.VideoException;
 
 /**
  * VIDEO POJO Class
+ * 
  * @author HP
  *
  */
 public class Video {
 
+	private static final int MIN_NAME_LENGTH = 3;
 	private long video_id;
 	private String name;
 	private int views;
@@ -21,7 +25,8 @@ public class Video {
 	private String thumbnail_url;
 	private String description;
 	private long privacy_id;
-	private HashSet<Tag> tags = new HashSet<>();
+
+	private List<Tag> tags = new ArrayList<>();
 
 	/**
 	 * Use this contructor when get video from database
@@ -47,8 +52,8 @@ public class Video {
 	 * @param tags
 	 *            - video tags
 	 */
-	public Video(long video_id, String name, int views, LocalDateTime date, String location_url, long user_id,
-			String thumbnail_url, String description, long privacy_id, HashSet<Tag> tags) {
+	Video(long video_id, String name, int views, LocalDateTime date, String location_url, long user_id,
+			String thumbnail_url, String description, long privacy_id, List<Tag> tags) {
 		this.video_id = video_id;
 		this.name = name;
 		this.views = views;
@@ -59,40 +64,6 @@ public class Video {
 		this.description = description;
 		this.privacy_id = privacy_id;
 		this.tags = tags;
-	}
-
-	
-	@Override
-	public String toString() {
-		return "Video [video_id=" + video_id + ", name=" + name + ", views=" + views + ", date=" + date
-				+ ", location_url=" + location_url + ", user_id=" + user_id + ", thumbnail_url=" + thumbnail_url
-				+ ", description=" + description + ", privacy_id=" + privacy_id + ", tags=" + tags + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((location_url == null) ? 0 : location_url.hashCode());
-		return result;
-	}
-
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Video other = (Video) obj;
-		if (location_url == null) {
-			if (other.location_url != null)
-				return false;
-		} else if (!location_url.equals(other.location_url))
-			return false;
-		return true;
 	}
 
 	/**
@@ -108,56 +79,70 @@ public class Video {
 	 *            - user who create the video
 	 * @param tags
 	 *            - video tags
+	 * @throws VideoException
 	 */
-	public Video(String name, String location_url, long privacy_id, long user_id, HashSet<Tag> tags) {
-		this.name = name;
-		this.location_url = location_url;
-		this.privacy_id = privacy_id;
-		this.user_id = user_id;
-		this.tags = tags;
+	public Video(String name, String location_url, long privacy_id, long user_id, List<Tag> tags)
+			throws VideoException {
+		setName(name);
+		setLocation_url(location_url);
+		setPrivacy_id(privacy_id);
+		setUser_id(user_id);
+		setTags(tags);
 
 		this.date = LocalDateTime.now();
 		this.views = 0;
 	}
 
+	public void addTag(Tag t) {
+		this.tags.add(t);
+	}
+
 	public LocalDateTime getDate() {
-		return date;
+		return this.date;
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public String getLocation_url() {
-		return location_url;
+		return this.location_url;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public long getPrivacy_id() {
-		return privacy_id;
+		return this.privacy_id;
 	}
-	
-	public HashSet<Tag> getTags() {
-		return tags;
+
+	public List<Tag> getTags() {
+		return this.tags;
 	}
 
 	public String getThumbnail_url() {
-		return thumbnail_url;
+		return this.thumbnail_url;
 	}
 
 	public long getUser_id() {
-		return user_id;
+		return this.user_id;
 	}
 
 	public long getVideo_id() {
-		return video_id;
+		return this.video_id;
 	}
 
 	public int getViews() {
-		return views;
+		return this.views;
+	}
+
+	public void removeTag(Tag t) {
+		this.tags.remove(t);
+	}
+
+	public void setDate(LocalDateTime date) {
+		this.date = date;
 	}
 
 	public void setDescription(String description) throws VideoException {
@@ -167,11 +152,32 @@ public class Video {
 		this.description = description;
 	}
 
+	public void setLocation_url(String location_url) throws VideoException {
+		if (name == null || name.isEmpty()) {
+			throw new VideoException(VideoException.INVALID_LOCATION);
+		}
+		this.location_url = location_url;
+	}
+
+	public void setName(String name) throws VideoException {
+		if (name == null || name.isEmpty()) {
+			throw new VideoException(VideoException.INVALID_NAME);
+		}
+		if (name.length() < MIN_NAME_LENGTH) {
+			throw new VideoException(VideoException.INVALID_NAME_LENGTH);
+		}
+		this.name = name;
+	}
+	
 	public void setPrivacy_id(long privacy_id) throws VideoException {
 		if (privacy_id < 1) {
 			throw new VideoException(VideoException.INVALID_PRIVACY);
 		}
 		this.privacy_id = privacy_id;
+	}
+	
+	public void setTags(List<Tag> tags) {
+		this.tags = tags;
 	}
 
 	public void setThumbnail_url(String thumbnail_url) throws VideoException {
@@ -181,8 +187,26 @@ public class Video {
 		this.thumbnail_url = thumbnail_url;
 	}
 
+	public void setUser_id(long user_id) throws VideoException {
+		if (user_id < 1) {
+			throw new VideoException(UserException.INVALID_ID);
+		}
+		this.user_id = user_id;
+	}
+
 	public void setVideo_id(long video_id) {
 		this.video_id = video_id;
+	}
+
+	public void setViews(int views) {
+		this.views = views;
+	}
+
+	@Override
+	public String toString() {
+		return "Video [video_id=" + video_id + ", name=" + name + ", views=" + views + ", date=" + date
+				+ ", location_url=" + location_url + ", user_id=" + user_id + ", thumbnail_url=" + thumbnail_url
+				+ ", description=" + description + ", privacy_id=" + privacy_id + ", tags=" + tags + "]";
 	}
 
 }

@@ -2,14 +2,14 @@ package model;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import model.exceptions.user.UserException;
 import model.exceptions.user.UserNotFoundException;
-import model.utils.Hash;
 
 /**
  * USER POJO Class
@@ -18,17 +18,12 @@ import model.utils.Hash;
  *
  */
 public class User {
-	@Override
-	public String toString() {
-		return "User [user_id=" + user_id + ", username=" + username + ", password=" + password + ", facebook="
-				+ facebook + ", email=" + email + ", date_creation=" + date_creation + ", first_name=" + first_name
-				+ ", last_name=" + last_name + "]\n";
-	}
-
+	
+	private static final String DEFAULT_AVATAR_JPG = "./default_avatar.jpg";
 	private static final int MIN_USERNAME_LENGTH = 3;
-	private static final int MIN_PASSWORD_LENGTH = 3;
 
 	private long user_id;
+
 	private String username;
 	private String password;
 	private String facebook;
@@ -36,9 +31,12 @@ public class User {
 	private LocalDateTime date_creation;
 	private String first_name;
 	private String last_name;
+	private String avatar_url;
+	private String gender;
 
-	private HashSet<User> followers;
-	private HashSet<User> following;
+	private List<User> followers = new ArrayList<>();
+
+	private List<User> following = new ArrayList<>();
 
 	/**
 	 * Constructor for creating object user with all the fields e.g. get user from
@@ -54,16 +52,18 @@ public class User {
 	 * @param last_name
 	 * @throws UserException
 	 */
-	public User(long user_id, String username, String hashed_password, String facebook, String email,
-			LocalDateTime date_creation, String first_name, String last_name) throws UserException {
-		setUser_id(user_id);
-		setUsername(username);
-		setPassword(hashed_password);
-		setFacebook(facebook);
-		setEmail(email);
+	User(long user_id, String username, String password, String facebook, String email, LocalDateTime date_creation,
+			String first_name, String last_name, String avatar_url, String gender) throws UserException {
+		this.user_id = user_id;
+		this.username = username;
+		this.password = password;
+		this.facebook = facebook;
+		this.email = email;
 		this.date_creation = date_creation;
-		setFirst_name(first_name);
-		setLast_name(last_name);
+		this.first_name = first_name;
+		this.last_name = last_name;
+		this.avatar_url = avatar_url;
+		this.gender = gender;
 	}
 
 	/**
@@ -79,7 +79,18 @@ public class User {
 		setUsername(username);
 		setPassword(password);
 		setEmail(email);
+		this.avatar_url = DEFAULT_AVATAR_JPG;
 		this.date_creation = LocalDateTime.now();
+	}
+	public void addFollower(User u) {
+		this.followers.add(u);
+	}
+
+	public void addFollowing(User u) {
+		this.following.add(u);
+	}
+	public String getAvatar_url() {
+		return avatar_url;
 	}
 
 	public LocalDateTime getDate_creation() {
@@ -96,6 +107,18 @@ public class User {
 
 	public String getFirst_name() {
 		return first_name;
+	}
+	
+	public List<User> getFollowers() throws SQLException, UserNotFoundException, UserException {
+		return this.followers;
+	}
+
+	public List<User> getFollowing() throws SQLException, UserNotFoundException, UserException {
+		return this.following;
+	}
+	
+	public String getGender() {
+		return gender;
 	}
 
 	public String getLast_name() {
@@ -114,12 +137,25 @@ public class User {
 		return username;
 	}
 
-	public HashSet<User> getFollowers() throws SQLException, UserNotFoundException, UserException {
-		return UserDao.getInstance().getFollowers(this);
+	private boolean passwordIsStrong(String password) {
+		// https://stackoverflow.com/questions/3802192/regexp-java-for-password-validation
+		String pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
+		if (password.matches(pattern)) {
+			return true;
+		}
+		return false;
 	}
 
-	public HashSet<User> getFollowing() throws SQLException, UserNotFoundException, UserException {
-		return UserDao.getInstance().getFollowing(this);
+	public void removeFollower(User u) {
+		this.followers.remove(u);
+	}
+
+	public void removeFollowing(User u) {
+		this.following.remove(u);
+	}
+
+	public void setAvatar_url(String avatar_url) {
+		this.avatar_url = avatar_url;
 	}
 
 	private void setEmail(String email) throws UserException {
@@ -142,6 +178,7 @@ public class User {
 		if (facebook.matches(fbProfileRegex)) {
 			this.facebook = facebook;
 		}
+		
 		throw new UserException(UserException.INVALID_FACEBOOK);
 	}
 
@@ -149,23 +186,19 @@ public class User {
 		this.first_name = first_name;
 	}
 
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
 	public void setLast_name(String last_name) throws UserException {
 		this.last_name = last_name;
 	}
 
 	private void setPassword(String password) throws UserException {
-		if (password == null || password.isEmpty()) {
-			throw new UserException(UserException.INVALID_PASSWORD);
-		}
-		if (password.length() < MIN_PASSWORD_LENGTH) {
-			throw new UserException(UserException.INVALID_PASSWORD_LENGTH);
-		}
-		// TODO: Check for strong password
-		if (password.length() == 64) {
-			// already hashed
+		if (passwordIsStrong(password)) {
 			this.password = password;
 		} else {
-			this.password = Hash.getHashPass(password);
+			throw new UserException(UserException.PASSWORD_NOT_STRONG);
 		}
 	}
 
@@ -184,5 +217,12 @@ public class User {
 			throw new UserException(UserException.INVALID_USERNAME_LENGTH);
 		}
 		this.username = username;
+	}
+
+	@Override
+	public String toString() {
+		return "User [user_id=" + user_id + ", username=" + username + ", password=" + password + ", facebook="
+				+ facebook + ", email=" + email + ", date_creation=" + date_creation + ", first_name=" + first_name
+				+ ", last_name=" + last_name + "]\n";
 	}
 }

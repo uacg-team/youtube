@@ -2,43 +2,17 @@ package model;
 
 public class Tag {
 
-	@Override
-	public String toString() {
-		return "Tag [tag=" + tag + "]";
-	}
-
 	private long tag_id;
-	private String tag;
 
-	
+	private String tag;
 	
 	public Tag(long tag_id, String tag) {
 		this.tag_id = tag_id;
 		this.tag = tag;
 	}
-
+	
 	public Tag(String tag) {
 		this.tag = tag;
-	}
-	
-	public String getTag() {
-		return tag;
-	}
-	
-	public long getTag_id() {
-		return tag_id;
-	}
-	
-	public void setTag_id(long tag_id) {
-		this.tag_id = tag_id;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((tag == null) ? 0 : tag.hashCode());
-		return result;
 	}
 
 	@Override
@@ -56,6 +30,23 @@ public class Tag {
 		} else if (!tag.equals(other.tag))
 			return false;
 		return true;
+	}
+	
+	public String getTag() {
+		return tag;
+	}
+	
+	public long getTag_id() {
+		return tag_id;
+	}
+
+	public void setTag_id(long tag_id) {
+		this.tag_id = tag_id;
+	}
+
+	@Override
+	public String toString() {
+		return "Tag [tag=" + tag + "]";
 	}
 	
 	
