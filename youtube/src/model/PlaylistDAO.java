@@ -13,17 +13,17 @@ import model.exceptions.user.UserException;
 import model.utils.DBConnection;
 import model.utils.DateTimeConvertor;
 
-public class PlaylistDAO {
+public class PlaylistDao {
 	private static final Connection con = DBConnection.CON1.getConnection();
-	private static PlaylistDAO instance;
+	private static PlaylistDao instance;
 	static {
-		instance = new PlaylistDAO();
+		instance = new PlaylistDao();
 	}
 
-	private PlaylistDAO() {
+	private PlaylistDao() {
 	}
 
-	public static PlaylistDAO getInstance() {
+	public static PlaylistDao getInstance() {
 		return instance;
 	}
 
@@ -37,7 +37,7 @@ public class PlaylistDAO {
 	 */
 	public void createPlaylist(Playlist playlist) throws PlaylistException, SQLException, UserException {
 		// initial checks
-		List<Playlist> userPlayslist = PlaylistDAO.getInstance().getPlaylists(playlist.getUserId());
+		List<Playlist> userPlayslist = PlaylistDao.getInstance().getPlaylists(playlist.getUserId());
 		for (Playlist p : userPlayslist) {
 			if (p.getPlaylistName().equalsIgnoreCase(playlist.getPlaylistName())) {
 				throw new PlaylistException(PlaylistException.PLAYLIST_ALREADY_EXISTS);
