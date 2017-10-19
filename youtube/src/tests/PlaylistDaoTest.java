@@ -1,79 +1,73 @@
 package tests;
 
-import static org.junit.Assert.*;
-
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import model.Playlist;
 import model.PlaylistDao;
 import model.exceptions.playlists.PlaylistException;
 import model.exceptions.user.UserException;
+import model.utils.DBConnection;
 
 public class PlaylistDaoTest {
+	private static final Connection con = DBConnection.CON1.getConnection();
+
 	@Test
 	public void testCreatePlaylist() throws PlaylistException, SQLException, UserException {
-		// creating 10 playlist for user_id=1;
-		for (int i = 0; i < 10; i++) {
-			PlaylistDao.getInstance().createPlaylist(new Playlist("playlist" + i, 1));
-		}
-		// creating 10 playlist for user_id=2;
-		for (int i = 0; i < 10; i++) {
-			PlaylistDao.getInstance().createPlaylist(new Playlist("playlist" + i, 2));
+		// creating 10 playlist for user_id=j;
+		for (int j = 1; j <= 2; j++) {
+			for (int i = 0; i < 10; i++) {
+				PlaylistDao.getInstance().createPlaylist(new Playlist("playlist" + i, j));
+			}
 		}
 	}
 
 	@Test(expected = PlaylistException.class)
 	public void testCreatePlaylistWithSameNames() throws PlaylistException, SQLException, UserException {
-		// creating 10 playlist for user_id=1;
 		PlaylistDao.getInstance().createPlaylist(new Playlist("playlist" + 15, 1));
 		PlaylistDao.getInstance().createPlaylist(new Playlist("playlist" + 15, 1));
 	}
 
-	@Test
-	public void testUpdatePlaylist() {
-		fail("Not yet implemented");
+	@Test (expected = PlaylistException.class)
+	public void testDeletePlaylist() throws PlaylistException, SQLException, UserException {
+		Playlist p=PlaylistDao.getInstance().getPlaylist(1, "list");
+		PlaylistDao.getInstance().deletePlaylist(p.getPlaylistId());
+		p=PlaylistDao.getInstance().getPlaylist(1, "list");
 	}
 
 	@Test
-	public void testDeletePlaylist() {
-		fail("Not yet implemented");
+	public void testUpdateVideos() throws PlaylistException, SQLException, UserException {
+		Playlist p = new Playlist("myList", 1);
+		PlaylistDao.getInstance().createPlaylist(p);
+		p.setName("newList");
+		PlaylistDao.getInstance().updatePlaylist(p);
+		Playlist get = PlaylistDao.getInstance().getPlaylist(p.getUserId(), "newList");
+		Assert.assertTrue(p.getPlaylistName().equals(get.getPlaylistName()));
+		Assert.assertTrue(p.getPlaylistId() == (get.getPlaylistId()));
+		Assert.assertTrue(p.getUserId() == get.getUserId());
 	}
 
-	@Test
-	public void testGetPlaylistsLong() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetPlaylist() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testLoadVideosInPlaylist() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testAddVideo() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testRemoveVideo() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetPlaylists() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testSearchPlaylist() {
-		fail("Not yet implemented");
+	@Before
+	public void init() throws PlaylistException, SQLException, UserException {
+		String sql1 = "delete from playlists_has_videos";
+		String sql2 = "delete from playlists";
+		String sql3 = "alter table playlists AUTO_INCREMENT = 1";
+		try (PreparedStatement ps = con.prepareStatement(sql1)) {
+			ps.executeUpdate();
+		}
+		try (PreparedStatement ps = con.prepareStatement(sql2)) {
+			ps.executeUpdate();
+		}
+		try (PreparedStatement ps = con.prepareStatement(sql3)) {
+			ps.executeUpdate();
+		}
+		//for test delete
+		PlaylistDao.getInstance().createPlaylist(new Playlist("list", 1));
 	}
 
 }
