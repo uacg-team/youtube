@@ -12,6 +12,7 @@ public final class Hash {
 	public static String getHashPass(String password) {
 		byte[] bytes = password.getBytes();
 		byte[] hashBytes = coder.digest(bytes);
-		return Hex.toHexString(hashBytes);
+		StringBuilder sb = new StringBuilder(Hex.toHexString(hashBytes));
+		return sb.reverse().toString();
 	}
 }

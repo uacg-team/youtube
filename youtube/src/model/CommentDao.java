@@ -15,17 +15,17 @@ import model.exceptions.video.VideoException;
 import model.utils.DBConnection;
 import model.utils.DateTimeConvertor;
 
-public class CommentDAO {
+public class CommentDao {
 	private static final Connection con = DBConnection.CON1.getConnection();
-	private static CommentDAO instance;
+	private static CommentDao instance;
 	static {
-		instance = new CommentDAO();
+		instance = new CommentDao();
 	}
 
-	private CommentDAO() {
+	private CommentDao() {
 	}
 
-	public static CommentDAO getInstance() {
+	public static CommentDao getInstance() {
 		return instance;
 	}
 

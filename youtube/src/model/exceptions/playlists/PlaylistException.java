@@ -10,7 +10,8 @@ public class PlaylistException extends Exception {
 	public static final String INVALID_NAME_LENGTH_MIN = "name of playlist is too short!";
 	public static final String INVALID_NAME_LENGTH_MAX = "name of playlist is too long!";
 	public static final String INVALID_NAME_SYMBOLS = "dont use symbols: ; # % | \\ \" < or >";
-	public static final String VIDEO_AREADY_EXIST = "video exist in this playlist!";
+	public static final String VIDEO_ALREADY_EXIST = "video exist in this playlist!";
+	public static final String PLAYLIST_ALREADY_EXISTS = "playlist name already exist!";
 	public static final String VIDEOS_NOT_LOADED = "videos not loaded";
 	public PlaylistException(String message) {
 		super(message);
