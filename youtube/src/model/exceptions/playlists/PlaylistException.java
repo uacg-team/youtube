@@ -13,6 +13,8 @@ public class PlaylistException extends Exception {
 	public static final String VIDEO_ALREADY_EXIST = "video exist in this playlist!";
 	public static final String PLAYLIST_ALREADY_EXISTS = "playlist name already exist!";
 	public static final String VIDEOS_NOT_LOADED = "videos not loaded";
+	public static final String CANT_CREATE = "Cant create list!";
+	public static final String PLAYLIST_NOT_FOUND = "Playlist not found!";
 	public PlaylistException(String message) {
 		super(message);
 	}

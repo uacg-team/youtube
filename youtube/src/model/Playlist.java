@@ -97,7 +97,7 @@ public class Playlist {
 	 * @throws VideoException-INVALID_ID
 	 */
 	public void addVideo(Video video) throws PlaylistException, VideoException {
-		if (video == null || video.getVideo_id() == 0) {
+		if (video == null || video.getVideoId() == 0) {
 			throw new VideoException(VideoException.INVALID_ID);
 		}
 		if (!isLoaded) {
@@ -120,7 +120,7 @@ public class Playlist {
 	 * @throws PlaylistException VIDEOS_NOT_LOADED
 	 */
 	public void removeVideo(Video video) throws VideoException, VideoNotFoundException, PlaylistException {
-		if (video == null || video.getVideo_id() == 0) {
+		if (video == null || video.getVideoId() == 0) {
 			throw new VideoException(VideoException.INVALID_ID);
 		}
 		if (!isLoaded) {

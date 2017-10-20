@@ -1,6 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import model.exceptions.comments.CommentException;
 
@@ -12,9 +13,10 @@ public class Comment {
 	private long video_id;
 	private long replay_id;
 
+	private List<Comment> replays;
+	private boolean hasReplays;
 	/**
-	 * get all fields
-	 * default, use only by CommentDAO
+	 * get all fields default, use only by CommentDAO
 	 */
 	Comment(long id, String text, LocalDateTime date, long user_id, long video_id, Long replay_id) {
 		this.id = id;
@@ -27,9 +29,11 @@ public class Comment {
 
 	/**
 	 * register new comment use replayTo_id=0 to set no replay
+	 * 
 	 * @throws CommentException
 	 */
-	public Comment(String text, LocalDateTime date, long user_id, long video_id, long replay_id) throws CommentException {
+	public Comment(String text, LocalDateTime date, long user_id, long video_id, long replay_id)
+			throws CommentException {
 		setText(text);
 		setDate(date);
 		setUser_id(user_id);
@@ -69,9 +73,7 @@ public class Comment {
 	}
 
 	public void setDate(LocalDateTime date) throws CommentException {
-		if (date == null /*
-							 * || date.isAfter(LocalDateTime.now().minusMinutes(1))
-							 */) {
+		if (date == null) {
 			throw new CommentException(CommentException.INVALID_DATE);
 		}
 		this.date = date;
@@ -85,16 +87,28 @@ public class Comment {
 	}
 
 	public void setUser_id(long user_id) {
-		//user_id validate in other place
+		// user_id validate in other place
 		this.user_id = user_id;
 	}
 
 	public void setVideo_id(long video_id) {
-		//video_id validate in other place
+		// video_id validate in other place
 		this.video_id = video_id;
 	}
 
 	public void setReplay_id(long replay_id) {
 		this.replay_id = replay_id;
+	}
+
+	public void addReplays(List<Comment> allReplays) {
+		this.replays = allReplays;
+		this.hasReplays = true;
+	}
+
+	public List<Comment> getReplays() {
+		return replays;
+	}
+	public boolean getHasReplays() {
+		return hasReplays;
 	}
 }

@@ -16,16 +16,17 @@ import model.utils.DBConnection;
 import model.utils.DateTimeConvertor;
 
 public class CommentDao {
-	private static final Connection con = DBConnection.CON1.getConnection();
+	private final Connection con;
 	private static CommentDao instance;
-	static {
-		instance = new CommentDao();
-	}
 
 	private CommentDao() {
+		con = DBConnection.CON1.getConnection();
 	}
 
 	public static CommentDao getInstance() {
+		if(instance == null) {
+			instance = new CommentDao();
+		}
 		return instance;
 	}
 
