@@ -15,6 +15,8 @@ public class UserException extends Exception {
 	public static final String INVALID_EMAIL = "Invalid email";
 	public static final String INVALID_ID = "Invalid user id";
 	public static final String MORE_THAN_ONE_USER_AFFECTED = "Mode than one user affected";
+	public static final String USERNAME_EXIST = "This username already exist";
+	public static final String EMAIL_EXIST = "This email already exist";
 
 	public UserException(String message) {
 		super(message);

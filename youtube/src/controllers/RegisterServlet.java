@@ -3,27 +3,28 @@ package controllers;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import model.User;
 import model.UserDao;
 import model.exceptions.user.UserException;
 import model.utils.DBConnection;
 
-/**
- * Servlet implementation class RegisterServlet
- */
+
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.getRequestDispatcher("register.jsp").forward(request, response);
+	}
+	
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String username = request.getParameter("username");
@@ -34,20 +35,24 @@ public class RegisterServlet extends HttpServlet {
 		try {
 			u = new User(username, password, email);
 		} catch (UserException e) {
-			e.printStackTrace();
+			request.setAttribute("userError", e.getMessage());
+			request.getRequestDispatcher("register.jsp").forward(request, response);
+			return;
 		}
 
 		try {
 			if (UserDao.getInstance().existsUser(u.getUsername())) {
-				response.getWriter().append("user with email ").append(u.getEmail()).append(" exists");
+				request.setAttribute("userError", "This username already exist");
+				request.getRequestDispatcher("register.jsp").forward(request, response);
 			} else {
 				UserDao.getInstance().createUser(u);
-				System.out.println(u.getPassword());
-				response.getWriter().append("Well done, you registerred with id = " + u.getUser_id());
-				response.sendRedirect("home.html");
+				request.getSession().setAttribute("user", u);
+				response.sendRedirect("main");
+				//request.getRequestDispatcher("main.jsp").forward(request, response);
 			}
 		} catch (SQLException e) {
-			response.getWriter().append("SQLException: " + e.getMessage());
+			request.setAttribute("userError", "SQLException: " + e.getMessage());
+			request.getRequestDispatcher("register.jsp").forward(request, response);
 		} catch (UserException e) {
 			response.getWriter().append("UserException: " + e.getMessage());
 		}

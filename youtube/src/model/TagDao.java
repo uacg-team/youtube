@@ -65,7 +65,7 @@ public class TagDao {
 			tag = getTag(tag.getTag());
 			
 			PreparedStatement videos_has_tags = con.prepareStatement(insert_into_videos_has_tags);
-			videos_has_tags.setLong(1, v.getVideo_id());
+			videos_has_tags.setLong(1, v.getVideoId());
 			videos_has_tags.setLong(2, tag.getTag_id());
 			videos_has_tags.executeUpdate();
 		}
@@ -79,4 +79,5 @@ public class TagDao {
 			ps.executeUpdate();
 		}
 	}
+
 }

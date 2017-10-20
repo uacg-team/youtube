@@ -5,11 +5,9 @@ import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import model.User;
 import model.UserDao;
@@ -17,13 +15,16 @@ import model.exceptions.user.UserException;
 import model.exceptions.user.UserNotFoundException;
 import model.utils.Hash;
 
-/**
- * Servlet implementation class LoginServlet
- */
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-
+	
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.getRequestDispatcher("login.jsp").forward(request, response);
+	}
+	
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String username = request.getParameter("username");
@@ -31,20 +32,23 @@ public class LoginServlet extends HttpServlet {
 		try {
 			User u = UserDao.getInstance().getUser(username);
 			if (password.equals(u.getPassword())) {
+				request.getSession().setMaxInactiveInterval(-1);
 				request.getSession().setAttribute("user", u);
-				response.sendRedirect("home.html");
+				response.sendRedirect("main");
+				// request.getRequestDispatcher("main.jsp").forward(request, response);
 			} else {
-				System.out.println("wrong pass");
-				response.sendRedirect("login.html");
+				request.setAttribute("passwordError", "Wrong Password");
+				request.getRequestDispatcher("login.jsp").forward(request, response);
 			}
 		} catch (SQLException e) {
 			response.getWriter().append("SQLException: " + e.getMessage());
 		} catch (UserNotFoundException e) {
-			System.out.println("UserNotFoundException");
-			response.sendRedirect("login.html");
+			request.setAttribute("usernameError", "User do not exists");
+			request.getRequestDispatcher("login.jsp").forward(request, response);
 		} catch (UserException e) {
-			response.getWriter().append("UserException: " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			
 		}
 	}
-
 }

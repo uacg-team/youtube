@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLType;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,16 +38,17 @@ public class UserDao {
 	}
 
 	public void createUser(User u) throws SQLException, UserException {
-		String sql = "INSERT INTO users (username, password, email, date_creation) VALUES (?, ?, ?, ?)";
+		String sql = "INSERT INTO users (username, password, email, date_creation, avatar_url) VALUES (?, ?, ?, ?, ?)";
 		try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
 			ps.setString(1, u.getUsername());
 			ps.setString(2, u.getPassword());
 			ps.setString(3, u.getEmail());
-			ps.setString(4, DateTimeConvertor.ldtToSql(u.getDate_creation()));
+			ps.setString(4, DateTimeConvertor.ldtToSql(u.getDateCreation()));
+			ps.setString(5, u.getAvatarUrl());
 			ps.executeUpdate();
 			ResultSet rs = ps.getGeneratedKeys();
 			rs.next();
-			u.setUser_id(rs.getLong(1));
+			u.setUserId(rs.getLong(1));
 		}
 	}
 
@@ -74,38 +77,40 @@ public class UserDao {
 	}
 
 	public void updateUser(User u) throws SQLException, UserException, UserNotFoundException {
-		String sql = "UPDATE users SET password = ?, facebook = ?, email = ?, first_name = ?, last_name = ?, avatar_url = ?, gender = ?  WHERE user_id = ? ;";
+		String sql = "UPDATE users SET facebook = ?, password = ?, email = ?, first_name = ?, last_name = ?, avatar_url = ?, gender = ? WHERE user_id = ? ;";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
-			ps.setString(1, u.getPassword());
-			ps.setString(2, u.getFacebook());
+			ps.setString(1, u.getFacebook());
+			ps.setString(2, u.getPassword());
 			ps.setString(3, u.getEmail());
-			ps.setString(4, u.getFirst_name());
-			ps.setString(5, u.getLast_name());
-			ps.setString(6, u.getAvatar_url());
+			ps.setString(4, u.getFirstName());
+			ps.setString(5, u.getLastName());
+			ps.setString(6, u.getAvatarUrl());
 			ps.setString(7, u.getGender());
-			ps.setLong(8, u.getUser_id());
+//			ps.setNull(7, Types.VARCHAR);
+			ps.setLong(8, u.getUserId());
 			int affectedRows = ps.executeUpdate();
-
-			if (affectedRows > 1) {
-				throw new UserException(UserException.MORE_THAN_ONE_USER_AFFECTED);
-			}
+			
 			if (affectedRows == 0) {
-				throw new UserNotFoundException();
+				throw new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND);
 			}
 		}
 	}
 
 	public boolean existsUser(String username) throws SQLException {
-		String sql = "SELECT COUNT(*) FROM users WHERE username = ?;";
+		String sql = "SELECT * FROM users WHERE username = ?;";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
 			ps.setString(1, username);
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
+				//ResultSet is not empty
 				return true;
 			}
+			//ResultSet is empty
 			return false;
 		}
 	}
+	
+
 
 	public User getUser(String username) throws SQLException, UserNotFoundException, UserException {
 		String sql = "SELECT * FROM users WHERE username = ?;";
@@ -125,7 +130,7 @@ public class UserDao {
 						rs.getString("avatar_url"),
 						rs.getString("gender"));
 			} else {
-				throw new UserNotFoundException();
+				throw new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND);
 			}
 		}
 	}

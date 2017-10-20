@@ -10,78 +10,51 @@ import javax.mail.internet.InternetAddress;
 
 import model.exceptions.user.UserException;
 import model.exceptions.user.UserNotFoundException;
+import model.utils.Hash;
 
-/**
- * USER POJO Class
- * 
- * @author HP
- *
- */
 public class User {
-	
-	private static final String DEFAULT_AVATAR_JPG = "./default_avatar.jpg";
+
+	private static final String DEFAULT_AVATAR_JPG = "defaultAvatar.png";
 	private static final int MIN_USERNAME_LENGTH = 3;
 
-	private long user_id;
+	private long userId;
 
 	private String username;
 	private String password;
 	private String facebook;
 	private String email;
-	private LocalDateTime date_creation;
-	private String first_name;
-	private String last_name;
-	private String avatar_url;
+	private LocalDateTime dateCreation;
+	private String firstName;
+	private String lastName;
+	private String avatarUrl;
 	private String gender;
 
 	private List<User> followers = new ArrayList<>();
-
 	private List<User> following = new ArrayList<>();
 
-	/**
-	 * Constructor for creating object user with all the fields e.g. get user from
-	 * database
-	 * 
-	 * @param user_id
-	 * @param username
-	 * @param hashed_password
-	 * @param facebook
-	 * @param email
-	 * @param date_creation
-	 * @param first_name
-	 * @param last_name
-	 * @throws UserException
-	 */
-	User(long user_id, String username, String password, String facebook, String email, LocalDateTime date_creation,
-			String first_name, String last_name, String avatar_url, String gender) throws UserException {
-		this.user_id = user_id;
+	User(long userId, String username, String password, String facebook, String email, LocalDateTime dateCreation,
+			String firstName, String lastName, String avatarUrl, String gender) throws UserException {
+		this.userId = userId;
 		this.username = username;
 		this.password = password;
 		this.facebook = facebook;
 		this.email = email;
-		this.date_creation = date_creation;
-		this.first_name = first_name;
-		this.last_name = last_name;
-		this.avatar_url = avatar_url;
+		this.dateCreation = dateCreation;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.avatarUrl = avatarUrl;
 		this.gender = gender;
 	}
 
-	/**
-	 * Constructor for creating object user with all mandatory the fields e.g.
-	 * registering user
-	 * 
-	 * @param username
-	 * @param password
-	 * @param email
-	 * @throws UserException
-	 */
 	public User(String username, String password, String email) throws UserException {
 		setUsername(username);
 		setPassword(password);
 		setEmail(email);
-		this.avatar_url = DEFAULT_AVATAR_JPG;
-		this.date_creation = LocalDateTime.now();
+		this.avatarUrl = DEFAULT_AVATAR_JPG;
+		this.dateCreation = LocalDateTime.now();
 	}
+	
+
 	public void addFollower(User u) {
 		this.followers.add(u);
 	}
@@ -89,12 +62,13 @@ public class User {
 	public void addFollowing(User u) {
 		this.following.add(u);
 	}
-	public String getAvatar_url() {
-		return avatar_url;
+
+	public String getAvatarUrl() {
+		return avatarUrl;
 	}
 
-	public LocalDateTime getDate_creation() {
-		return date_creation;
+	public LocalDateTime getDateCreation() {
+		return dateCreation;
 	}
 
 	public String getEmail() {
@@ -105,10 +79,10 @@ public class User {
 		return facebook;
 	}
 
-	public String getFirst_name() {
-		return first_name;
+	public String getFirstName() {
+		return firstName;
 	}
-	
+
 	public List<User> getFollowers() throws SQLException, UserNotFoundException, UserException {
 		return this.followers;
 	}
@@ -116,21 +90,21 @@ public class User {
 	public List<User> getFollowing() throws SQLException, UserNotFoundException, UserException {
 		return this.following;
 	}
-	
+
 	public String getGender() {
 		return gender;
 	}
 
-	public String getLast_name() {
-		return last_name;
+	public String getLastName() {
+		return lastName;
 	}
 
 	public String getPassword() {
 		return password;
 	}
 
-	public long getUser_id() {
-		return user_id;
+	public long getUserId() {
+		return userId;
 	}
 
 	public String getUsername() {
@@ -154,11 +128,11 @@ public class User {
 		this.following.remove(u);
 	}
 
-	public void setAvatar_url(String avatar_url) {
-		this.avatar_url = avatar_url;
+	public void setAvatarUrl(String avatarUrl) {
+		this.avatarUrl = avatarUrl;
 	}
 
-	private void setEmail(String email) throws UserException {
+	public void setEmail(String email) throws UserException {
 		try {
 			InternetAddress emailAddr = new InternetAddress(email);
 			emailAddr.validate();
@@ -168,48 +142,38 @@ public class User {
 		this.email = email;
 	}
 
-	public void setFacebook(String facebook) throws UserException {
-		String fbProfileRegex = "((http|https):\\/\\/)?(www[.])?facebook.com\\/.+";
-		if (facebook == null) {
-			this.facebook = facebook;
-			return;
-		}
-
-		if (facebook.matches(fbProfileRegex)) {
-			this.facebook = facebook;
-		}
-		
-		throw new UserException(UserException.INVALID_FACEBOOK);
+	public void setFacebook(String facebook) {
+		this.facebook = facebook;
 	}
 
-	public void setFirst_name(String first_name) throws UserException {
-		this.first_name = first_name;
+	public void setFirstName(String firstName) throws UserException {
+		this.firstName = firstName;
 	}
 
 	public void setGender(String gender) {
 		this.gender = gender;
 	}
 
-	public void setLast_name(String last_name) throws UserException {
-		this.last_name = last_name;
+	public void setLastName(String lastName) throws UserException {
+		this.lastName = lastName;
 	}
 
 	private void setPassword(String password) throws UserException {
 		if (passwordIsStrong(password)) {
-			this.password = password;
+			this.password = Hash.getHashPass(password);
 		} else {
 			throw new UserException(UserException.PASSWORD_NOT_STRONG);
 		}
 	}
 
-	public void setUser_id(long user_id) throws UserException {
-		if (user_id < 1) {
+	public void setUserId(long userId) throws UserException {
+		if (userId < 1) {
 			throw new UserException(UserException.INVALID_ID);
 		}
-		this.user_id = user_id;
+		this.userId = userId;
 	}
 
-	private void setUsername(String username) throws UserException {
+	public void setUsername(String username) throws UserException {
 		if (username == null || username.isEmpty()) {
 			throw new UserException(UserException.INVALID_USERNAME);
 		}
@@ -217,12 +181,5 @@ public class User {
 			throw new UserException(UserException.INVALID_USERNAME_LENGTH);
 		}
 		this.username = username;
-	}
-
-	@Override
-	public String toString() {
-		return "User [user_id=" + user_id + ", username=" + username + ", password=" + password + ", facebook="
-				+ facebook + ", email=" + email + ", date_creation=" + date_creation + ", first_name=" + first_name
-				+ ", last_name=" + last_name + "]\n";
 	}
 }
