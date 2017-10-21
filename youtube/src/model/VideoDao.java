@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.internal.compiler.ast.ThrowStatement;
 
@@ -220,8 +222,8 @@ public class VideoDao {
 	 * @return HashSet<Tag> - all tags that video has
 	 * @throws SQLException
 	 */
-	private List<Tag> getTags(String location_url) throws SQLException {
-		List<Tag> tags = new ArrayList<>();
+	private Set<Tag> getTags(String location_url) throws SQLException {
+		Set<Tag> tags = new HashSet<>();
 		String getTags = "SELECT tags.tag FROM videos_has_tags JOIN tags USING (tag_id) JOIN videos ON (videos_has_tags.video_id = videos.video_id) WHERE location_url = ? ;";
 		try (PreparedStatement ps_tags = con.prepareStatement(getTags);) {
 			ps_tags.setString(1, location_url);
@@ -278,7 +280,7 @@ public class VideoDao {
 			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
-				List<Tag> tags = new ArrayList<>();
+				Set<Tag> tags = new HashSet<>();
 				String getTags = "SELECT tags.tag FROM videos_has_tags JOIN tags USING (tag_id) WHERE videos_has_tags.video_id = ? ;";
 				PreparedStatement ps_tags = con.prepareStatement(getTags);
 				ps_tags.setLong(1, rs.getLong("video_id"));
@@ -367,9 +369,9 @@ public class VideoDao {
 		}
 	}
 
-	public List<Video> getRelatedVideos(String location_url) throws SQLException, VideoNotFoundException {
-		List<Tag> tags = getTags(location_url);
-		List<Video> relatedVideos = new ArrayList<>();
+	public Set<Video> getRelatedVideos(String location_url) throws SQLException, VideoNotFoundException {
+		Set<Tag> tags = getTags(location_url);
+		Set<Video> relatedVideos = new HashSet<>();
 		
 		for (Tag tag : tags) {
 			String sql = "SELECT v.location_url FROM videos as v "
@@ -381,7 +383,11 @@ public class VideoDao {
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()) {
 				String videoUrl = rs.getString("location_url");
-				relatedVideos.add(getVideo(videoUrl));
+				Video video = getVideo(videoUrl);
+				if (video.getLocationUrl().equals(location_url)) {
+					continue;
+				}
+				relatedVideos.add(video);
 			}
 		}
 		return relatedVideos;
