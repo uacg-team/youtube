@@ -28,6 +28,8 @@ CREATE TABLE IF NOT EXISTS `youtubeDB`.`users` (
   `date_creation` DATETIME NOT NULL,
   `first_name` VARCHAR(45) NULL,
   `last_name` VARCHAR(45) NULL,
+  `avatar_url` VARCHAR(200) NULL,
+  `gender` VARCHAR(45) NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE INDEX `username_UNIQUE` (`username` ASC),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC))
@@ -66,7 +68,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `youtubeDB`.`videos` (
   `video_id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NOT NULL,
+  `name` VARCHAR(200) NOT NULL,
   `views` INT NOT NULL,
   `date` DATETIME NOT NULL,
   `location_url` VARCHAR(200) NOT NULL,
@@ -95,14 +97,14 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `youtubeDB`.`comments` (
   `comment_id` INT NOT NULL AUTO_INCREMENT,
-  `text` VARCHAR(200) NULL,
+  `text` VARCHAR(1000) NULL,
   `date` DATETIME NOT NULL,
   `video_id` INT NOT NULL,
-  `replay_id` INT NULL,
+  `reply_id` INT NULL,
   `user_id` INT NOT NULL,
   PRIMARY KEY (`comment_id`),
   INDEX `fk_comments_videos1_idx` (`video_id` ASC),
-  INDEX `fk_comments_comments1_idx` (`replay_id` ASC),
+  INDEX `fk_comments_comments1_idx` (`reply_id` ASC),
   INDEX `fk_comments_users1_idx` (`user_id` ASC),
   CONSTRAINT `fk_comments_videos1`
     FOREIGN KEY (`video_id`)
@@ -110,7 +112,7 @@ CREATE TABLE IF NOT EXISTS `youtubeDB`.`comments` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_comments_comments1`
-    FOREIGN KEY (`replay_id`)
+    FOREIGN KEY (`reply_id`)
     REFERENCES `youtubeDB`.`comments` (`comment_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
@@ -248,6 +250,7 @@ ENGINE = InnoDB;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
 
 
 INSERT into privacy_settings (name) values('Private');

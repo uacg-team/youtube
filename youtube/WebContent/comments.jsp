@@ -15,10 +15,10 @@
 			<c:out value="${comment.text}"></c:out>
 		</div>
 			<br>
-			<c:if test="${comment.hasReplays}">
-				<c:forEach items="${comment.replays}" var="replay">
-					<div id="replay">
-						<c:out value="${replay.text}"></c:out>
+			<c:if test="${comment.hasReplies}">
+				<c:forEach items="${comment.replies}" var="reply">
+					<div id="reply">
+						<c:out value="${reply.text}"></c:out>
 						<br>
 					</div>
 				</c:forEach>
@@ -42,21 +42,21 @@
   					
   				<!-- <div class="triangle-comment"></div> -->
 	</div>
-		<c:if test="${comment.hasReplays}">
-			<c:forEach items="${comment.replays}" var="replay">
-				<div class="replay-box">
- 					<p class="replay-header">
+		<c:if test="${comment.hasReplies}">
+			<c:forEach items="${comment.replies}" var="reply">
+				<div class="reply-box">
+ 					<p class="reply-header">
    					 <span>User</span> info <span>info</span> Front-end
   					</p>
-				<div class="replay-box-inner"> 
-   					 <p>${replay.text} <br />
+				<div class="reply-box-inner"> 
+   					 <p>${reply.text} <br />
    					 </p>  
  				</div>
   				<!-- <div class="triangle-comment"></div> -->
   				<!-- Neobhodimo e preminavane prez SimpleDateTime-nqma LocalDateTime v JSTL -->
-  				<%-- <fmt:parseDate value = "${replay.date}" var = "parsedDate" pattern = "dd-mm-yyyy" /> --%>
+  				<%-- <fmt:parseDate value = "${reply.date}" var = "parsedDate" pattern = "dd-mm-yyyy" /> --%>
   				<p class="comment-date">
-    				<c:out value="${replay.date}"/>
+    				<c:out value="${reply.date}"/>
   				</p>
 				</div>
 			</c:forEach>

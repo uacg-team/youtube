@@ -24,10 +24,13 @@ public class CommentServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		List<Comment> comments = null;
+		int countComments = 0;
 		try {
 			comments = CommentDao.getInstance().getAllComments(1, false);
 			for (Comment c : comments) {
-				c.addReplays(CommentDao.getInstance().getAllReplays(c.getId()));
+				List<Comment> replies = CommentDao.getInstance().getAllReplies(c.getCommentId());
+				c.addReplies(replies);
+				countComments += replies.size() + 1;
 			}
 		} catch (VideoException | SQLException e) {
 			request.setAttribute("Exception", "exception");
@@ -35,7 +38,7 @@ public class CommentServlet extends HttpServlet {
 			request.setAttribute("Exception", "exception");
 		}
 		request.setAttribute("comments", comments);
-		request.setAttribute("countComments", 5);
+		request.setAttribute("countComments", countComments);
 		request.getRequestDispatcher("comments.jsp").forward(request, response);
 	}
 	

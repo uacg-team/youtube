@@ -6,43 +6,43 @@ import java.util.List;
 import model.exceptions.comments.CommentException;
 
 public class Comment {
-	private long id;
+	private long commentId;
 	private String text;
 	private LocalDateTime date;
-	private long user_id;
-	private long video_id;
-	private long replay_id;
+	private long userId;
+	private long videoId;
+	private long replyId;
 
-	private List<Comment> replays;
-	private boolean hasReplays;
+	private List<Comment> replies;
+	private boolean hasReplies;
+
 	/**
 	 * get all fields default, use only by CommentDAO
 	 */
-	Comment(long id, String text, LocalDateTime date, long user_id, long video_id, Long replay_id) {
-		this.id = id;
+	Comment(long commentId, String text, LocalDateTime date, long userId, long videoId, Long replyId) {
+		this.commentId = commentId;
 		this.text = text;
 		this.date = date;
-		this.user_id = user_id;
-		this.video_id = video_id;
-		this.replay_id = replay_id;
+		this.userId = userId;
+		this.videoId = videoId;
+		this.replyId = replyId;
 	}
 
 	/**
-	 * register new comment use replayTo_id=0 to set no replay
+	 * register new comment use repltId=0 to set no reply
 	 * 
 	 * @throws CommentException
 	 */
-	public Comment(String text, LocalDateTime date, long user_id, long video_id, long replay_id)
-			throws CommentException {
+	public Comment(String text, LocalDateTime date, long userId, long videoId, long replyId) throws CommentException {
 		setText(text);
 		setDate(date);
-		setUser_id(user_id);
-		setVideo_id(video_id);
-		setReplay_id(replay_id);
+		setUserId(userId);
+		setVideoId(videoId);
+		setReplyId(replyId);
 	}
 
-	public long getId() {
-		return id;
+	public long getCommentId() {
+		return commentId;
 	}
 
 	public String getText() {
@@ -53,23 +53,23 @@ public class Comment {
 		return date;
 	}
 
-	public long getUser_id() {
-		return user_id;
+	public long getUserId() {
+		return userId;
 	}
 
-	public long getVideo_id() {
-		return video_id;
+	public long getVideoId() {
+		return videoId;
 	}
 
-	public long getReplayTo_id() {
-		return replay_id;
+	public long getReplyId() {
+		return replyId;
 	}
 
 	public void setId(long id) throws CommentException {
 		if (id < 1) {
 			throw new CommentException(CommentException.INVALID_ID);
 		}
-		this.id = id;
+		this.commentId = id;
 	}
 
 	public void setDate(LocalDateTime date) throws CommentException {
@@ -86,29 +86,30 @@ public class Comment {
 		this.text = text;
 	}
 
-	public void setUser_id(long user_id) {
+	public void setUserId(long userId) {
 		// user_id validate in other place
-		this.user_id = user_id;
+		this.userId = userId;
 	}
 
-	public void setVideo_id(long video_id) {
+	public void setVideoId(long videoId) {
 		// video_id validate in other place
-		this.video_id = video_id;
+		this.videoId = videoId;
 	}
 
-	public void setReplay_id(long replay_id) {
-		this.replay_id = replay_id;
+	public void setReplyId(long replayId) {
+		this.replyId = replayId;
 	}
 
-	public void addReplays(List<Comment> allReplays) {
-		this.replays = allReplays;
-		this.hasReplays = true;
+	public void addReplies(List<Comment> allReplies) {
+		this.replies = allReplies;
+		this.hasReplies = true;
 	}
 
-	public List<Comment> getReplays() {
-		return replays;
+	public List<Comment> getReplies() {
+		return replies;
 	}
-	public boolean getHasReplays() {
-		return hasReplays;
+
+	public boolean getHasReplies() {
+		return hasReplies;
 	}
 }
