@@ -34,6 +34,8 @@ div.inline {
 	<video width="800" height="600" autoplay controls preload="auto">
 	  		<source src="video?url=${requestScope.mainVideo.locationUrl}&userId=${mainVideo.userId}" type="video/mp4">
 	</video>
+	<br>
+	<jsp:include page="comments.jsp"></jsp:include>
 	</div>
 	
 	<h1>RELATED</h1>
@@ -53,8 +55,7 @@ div.inline {
 	</c:forEach>
 		
 
- 	
-
+ 
 	
 			
 </body>

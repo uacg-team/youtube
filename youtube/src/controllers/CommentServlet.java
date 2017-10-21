@@ -23,67 +23,73 @@ import model.exceptions.video.VideoException;
 @WebServlet("/test")
 public class CommentServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//		//load all info for video comments
-//		List<Comment> comments = null;
-//		int countComments = 0;
-//		
-//		try {
-//			//TODO set video id with real id!!!!
-//			comments = CommentDao.getInstance().getAllComments(1, false);
-//			for (Comment c : comments) {
-//				List<Comment> replies = CommentDao.getInstance().getAllReplies(c.getCommentId());
-//				c.addReplies(replies);
-//				countComments += replies.size() + 1;
-//				//load likes dislikes for comment:
-//				c.setLikes(CommentDao.getInstance().getLikes(c.getCommentId()));
-//				c.setDislikes(CommentDao.getInstance().getDislikes(c.getCommentId()));
-//				//load likes dislikes for reply: 
-//				for(Comment reply:replies) {
-//					reply.setLikes(CommentDao.getInstance().getLikes(reply.getCommentId()));
-//					reply.setDislikes(CommentDao.getInstance().getDislikes(reply.getCommentId()));
-//				}
-//			}
-//			request.setAttribute("comments", comments);
-//			request.setAttribute("countComments", countComments);
-//		} catch (VideoException e) {
-//			request.setAttribute("Exception", e.getMessage());
-//		} catch (SQLException e) {
-//			request.setAttribute("Exception", "exception");
-//		} catch (CommentException e) {
-//			request.setAttribute("Exception", e.getMessage());
-//		}finally {
-//			request.getRequestDispatcher("comments.jsp").forward(request, response);
-//		}
-		Comments.loadCommentsForVideo(request);
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+//TODO	long videoId = ((Video)request.getAttribute("mainVideo")).getVideoId();
+		long videoId = 2;
+		CommentServlet.loadCommentsForVideo(request,videoId);
 		request.getRequestDispatcher("comments.jsp").forward(request, response);
 	}
-	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		//add new comment or reply
-		User u = ((User)request.getSession().getAttribute("user"));
-		if(u == null) {
-			//TODO throw exception not logged error first login
-		}else {
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// add new comment or reply
+		User u = ((User) request.getSession().getAttribute("user"));
+		if (u == null) {
+			response.sendRedirect("login");
+		} else {
 			String text = request.getParameter("newComment");
-			long userId =u.getUserId();
+			long userId = u.getUserId();
 			long videoId = Long.valueOf(request.getParameter("videoId"));
 			long reply;
-			if(request.getParameter("reply") == null) {
+			if (request.getParameter("reply") == null) {
 				reply = 0;
-			}else {
-				reply=Long.valueOf(request.getParameter("reply"));
+			} else {
+				reply = Long.valueOf(request.getParameter("reply"));
 			}
 			try {
 				Comment comment = new Comment(text, LocalDateTime.now(), userId, videoId, reply);
 				CommentDao.getInstance().createComment(comment);
 			} catch (CommentException e) {
-				// TODO handle
+				//TODO handle
 			} catch (SQLException e) {
-				// TODO handle
+				//TODO handle
 			}
 		}
 		doGet(request, response);
+	}
+
+	public static HttpServletRequest loadCommentsForVideo(HttpServletRequest request,long videoId) {
+		// load all info for video comments
+		List<Comment> comments = null;
+		int countComments = 0;
+
+		try {
+			comments = CommentDao.getInstance().getAllComments(videoId, false);
+			for (Comment c : comments) {
+				List<Comment> replies = CommentDao.getInstance().getAllReplies(c.getCommentId());
+				c.addReplies(replies);
+				countComments += replies.size() + 1;
+				// load likes dislikes for comment:
+				c.setLikes(CommentDao.getInstance().getLikes(c.getCommentId()));
+				c.setDislikes(CommentDao.getInstance().getDislikes(c.getCommentId()));
+				// load likes dislikes for reply:
+				for (Comment reply : replies) {
+					reply.setLikes(CommentDao.getInstance().getLikes(reply.getCommentId()));
+					reply.setDislikes(CommentDao.getInstance().getDislikes(reply.getCommentId()));
+				}
+			}
+			request.setAttribute("comments", comments);
+			request.setAttribute("countComments", countComments);
+		} catch (VideoException e) {
+			request.setAttribute("error", e.getMessage());
+		} catch (SQLException e) {
+			request.setAttribute("error", "sql exception"+e.getMessage());
+		} catch (CommentException e) {
+			request.setAttribute("error", e.getMessage());
+		}
+		return request;
 	}
 
 }

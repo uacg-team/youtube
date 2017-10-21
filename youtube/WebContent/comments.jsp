@@ -24,6 +24,15 @@
 				</c:forEach>
 			</c:if>
 	</c:forEach> --%>
+	<%-- <c:if test="${sessionScope.user.userId}==$"></c:if> --%>
+	<form action="test?videoId=${requestScope.mainVideo.videoId}" method="post">
+		New Comment<input type="text" placeholder="add comment" name="newComment"/>
+		<input type="submit" value="comment"/>
+	</form>
+	
+	
+	
+	
 	<c:out value="Comments: ${requestScope.countComments}"></c:out>
 	<br>
 	
@@ -40,8 +49,19 @@
     					${comment.date}
   					</p>
   					
-  				<!-- <div class="triangle-comment"></div> -->
+	  				<!-- <div class="triangle-comment"></div> -->
+	  				<form action="commentLike?videoId=${requestScope.mainVideo.videoId}&commentId=${comment.commentId}&like=1&url=${requestScope.mainVideo.locationUrl}" method="post">
+					<input type="submit" value="like"/>
+					</form>
+					<form action="commentLike?videoId=${requestScope.mainVideo.videoId}&commentId=${comment.commentId}&like=-1&url=${requestScope.mainVideo.locationUrl}" method="post">
+					<input type="submit" value="dislike"/>
+					</form>
+		
 	</div>
+				<form action="test?videoId=${requestScope.mainVideo.videoId}&reply=${comment.commentId}" method="post">
+					New reply<input type="text" placeholder="add comment" name="newComment"/>
+					<input type="submit" value="reply"/>
+				</form>
 		<c:if test="${comment.hasReplies}">
 			<c:forEach items="${comment.replies}" var="reply">
 				<div class="reply-box">
@@ -58,7 +78,19 @@
   				<p class="comment-date">
     				<c:out value="${reply.date}"/>
   				</p>
+  				
+  				 <form action="commentLike?videoId=${requestScope.mainVideo.videoId}&commentId=${reply.commentId}&like=1&url=${requestScope.mainVideo.locationUrl}" method="post">
+				<input type="submit" value="like"/>
+				</form>
+				<form action="commentLike?videoId=${requestScope.mainVideo.videoId}&commentId=${reply.commentId}&like=-1&url=${requestScope.mainVideo.locationUrl}" method="post">
+				<input type="submit" value="dislike"/>
+				</form>
+  				
 				</div>
+					<form action="test?videoId=${requestScope.mainVideo.videoId}&reply=${comment.commentId}" method="post">
+						New reply<input type="text" placeholder="add comment" name="newComment"/>
+						<input type="submit" value="reply"/>
+					</form>
 			</c:forEach>
 		</c:if>
  </c:forEach>

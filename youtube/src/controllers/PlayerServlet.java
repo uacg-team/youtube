@@ -27,6 +27,7 @@ public class PlayerServlet extends HttpServlet {
 			Set<Video> related = VideoDao.getInstance().getRelatedVideos(video.getLocationUrl());
 			request.setAttribute("mainVideo", video);
 			request.setAttribute("related", related);
+			CommentServlet.loadCommentsForVideo(request, video.getVideoId());
 			request.getRequestDispatcher("player.jsp").forward(request, response);
 		} catch (VideoNotFoundException e) {
 			e.printStackTrace();

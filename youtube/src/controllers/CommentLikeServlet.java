@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import model.CommentDao;
 import model.User;
+import model.Video;
 import model.exceptions.comments.CommentException;
 import model.exceptions.user.UserException;
 
@@ -21,7 +22,8 @@ public class CommentLikeServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		User u = ((User)request.getSession().getAttribute("user"));
 		if(u == null) {
-			//TODO throw exception not logged error first login
+			response.sendRedirect("login");
+			return;
 		}else {
 			long commentId = Long.valueOf(request.getParameter("commentId"));
 			int like = Integer.valueOf(request.getParameter("like"));
@@ -33,15 +35,21 @@ public class CommentLikeServlet extends HttpServlet {
 					CommentDao.getInstance().dislikeComment(commentId, u.getUserId());
 				}
 			} catch (SQLException e) {
-				// TODO handle
+				request.setAttribute("error", "sqlException "+e.getMessage());
+				request.getRequestDispatcher("player").forward(request, response);
+				return;
 			} catch (CommentException e) {
-				// TODO handle
+				request.setAttribute("error",e.getMessage());
+				request.getRequestDispatcher("player").forward(request, response);
+				return;
 			} catch (UserException e) {
-				// TODO handle
+				request.setAttribute("error",e.getMessage());
+				request.getRequestDispatcher("player").forward(request, response);
+				return;
 			}
+			//TODO preprashta kym videoto CommentServlet!!!
+			response.sendRedirect("player?url="+request.getParameter("url"));
 		}
-		//TODO preprashta kym videoto CommentServlet
-		request.getRequestDispatcher("test").forward(request, response);
 	}
 
 }
