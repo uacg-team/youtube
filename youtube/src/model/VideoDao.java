@@ -1,7 +1,5 @@
 package model;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,7 +38,7 @@ public class VideoDao {
 	}
 
 	/**
-	 * А method to create a new database entry
+	 * Ð� method to create a new database entry
 	 * @param v - object to be inserted into the database 
 	 * @throws SQLException
 	 * @throws TagNotFoundException
