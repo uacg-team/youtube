@@ -20,9 +20,9 @@ public class PlayerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
 		try {
 			String videoURL = request.getParameter("url");
+			VideoDao.getInstance().increaseViews(videoURL);
 			Video video = VideoDao.getInstance().getVideo(videoURL);
 			Set<Video> related = VideoDao.getInstance().getRelatedVideos(video.getLocationUrl());
 			request.setAttribute("mainVideo", video);

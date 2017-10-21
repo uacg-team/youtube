@@ -39,12 +39,31 @@ public class VideoDao {
 	private VideoDao() {
 	}
 
-	/**
-	 * Ð� method to create a new database entry
-	 * @param v - object to be inserted into the database 
-	 * @throws SQLException
-	 * @throws TagNotFoundException
-	 */
+	public String getPrivacy(Long privacyId) throws SQLException {
+		String result = null;
+		String sql = "SELECT name FROM privacy_settings WHERE privacy_id = ?;";
+		try(PreparedStatement ps = con.prepareStatement(sql);){
+			ps.setLong(1, privacyId);
+			ResultSet rs = ps.executeQuery();
+			rs.next();
+			result = rs.getString("name");
+		}
+		return result;
+	}
+	
+	public String getUserName(Long userId) throws SQLException {
+		String result = null;
+		String sql = "SELECT username FROM youtubedb.users WHERE user_id = ?;";
+		try(PreparedStatement ps = con.prepareStatement(sql);){
+			ps.setLong(1, userId);
+			ResultSet rs = ps.executeQuery();
+			rs.next();
+			result = rs.getString("username");
+		}
+		return result;
+	}
+	
+	
 	public void createVideo(Video v) throws SQLException, TagNotFoundException {
 		con.setAutoCommit(false);
 		String sql = "INSERT into videos (name, views , date, location_url, user_id, thumbnail_url, description, privacy_id) VALUES(?,?,?,?,?,?,?,?);";
@@ -97,6 +116,7 @@ public class VideoDao {
 			con.setAutoCommit(false);
 			deleteVideoLikes(v.getVideoId());
 			deleteVideosFromPlaylist(v.getVideoId());
+			CommentDao.getInstance().deleteComments(v.getVideoId());
 			String sql = "DELETE FROM videos WHERE video_id = ?;";
 			try (PreparedStatement ps = con.prepareStatement(sql);) {
 				ps.setLong(1, v.getVideoId());
@@ -129,12 +149,6 @@ public class VideoDao {
 		}
 	}
 
-	/**
-	 * Check if video exist
-	 * @param v - check this video
-	 * @return
-	 * @throws SQLException
-	 */
 	public boolean existsVideo(long video_id) throws SQLException {
 		String sql = "SELECT COUNT(*) FROM videos WHERE video_id=?;";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
@@ -158,12 +172,6 @@ public class VideoDao {
 //		VideoDao.getInstance().deleteVideo(video);
 	}
 	
-
-	/**
-	 * Get all videos sorted by date uploaded
-	 * @return HashSet<Video> - all videos ordered by date uploaded
-	 * @throws SQLException
-	 */
 	public List<Video> getAllVideoOrderByDate() throws SQLException {
 		String sql = "SELECT * FROM videos WHERE privacy_id = 1 ORDER BY date DESC;";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
@@ -187,13 +195,9 @@ public class VideoDao {
 		}
 	}
 
-	/**
-	 * Get all videos sorted by number of likes
-	 * @return HashSet<Video> - all videos ordered by number of likes
-	 * @throws SQLException
-	 */
+	
 	public List<Video> getAllVideoOrderByLikes() throws SQLException {
-		String sql = "SELECT v.video_id, v.name, v.views, v.date, v.location_url, v.user_id, v.thumbnail_url, v.description, v.privacy_id, SUM(video_likes.isLike) AS likes FROM videos as v JOIN video_likes USING (video_id) GROUP BY video_id ORDER BY SUM(video_likes.isLike) DESC;";
+		String sql = "SELECT v.video_id, v.name, v.views, v.date, v.location_url, v.user_id, v.thumbnail_url, v.description, v.privacy_id, SUM(video_likes.isLike) AS likes FROM videos as v LEFT JOIN video_likes USING (video_id) GROUP BY video_id ORDER BY SUM(video_likes.isLike) DESC;";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
 			ResultSet rs = ps.executeQuery();
 
@@ -216,12 +220,6 @@ public class VideoDao {
 		}
 	}
 
-	/**
-	 * Get all tags of the video
-	 * @param location_url - the video url
-	 * @return HashSet<Tag> - all tags that video has
-	 * @throws SQLException
-	 */
 	private Set<Tag> getTags(String location_url) throws SQLException {
 		Set<Tag> tags = new HashSet<>();
 		String getTags = "SELECT tags.tag FROM videos_has_tags JOIN tags USING (tag_id) JOIN videos ON (videos_has_tags.video_id = videos.video_id) WHERE location_url = ? ;";
@@ -323,19 +321,10 @@ public class VideoDao {
 			ps.setLong(2, user_id);
 			ps.executeUpdate();
 		}
-		
-		
 	}
 
-	/**
-	 * Search video by word. Searching in the video name.
-	 * @param name - searching phrase
-	 * @return ArrayList<Video> - all videos whose names match the search phrase 
-	 * @throws SQLException
-	 * @throws VideoException 
-	 */
 	public List<Video> searchVideo(String name) throws SQLException, VideoException {
-		String sql = "SELECT * FROM videos WHERE LOWER(name) LIKE LOWER(?)";
+		String sql = "SELECT * FROM videos WHERE name LIKE ?";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
 			ps.setString(1, "%" + name + "%");
 			ResultSet rs = ps.executeQuery();
@@ -353,11 +342,6 @@ public class VideoDao {
 		}
 	}
 
-	/**
-	 * A method for editing an existing database entry
-	 * @param v - object to be edited into the database 
-	 * @throws SQLException
-	 */
 	public void updateVideo(Video v) throws SQLException {
 		String sql = "UPDATE videos SET name = ?, description = ?, privacy_id = ? where video_id = ?;";
 		try (PreparedStatement ps = con.prepareStatement(sql);){
@@ -391,5 +375,43 @@ public class VideoDao {
 			}
 		}
 		return relatedVideos;
+	}
+
+	public void increaseViews(String videoURL) throws SQLException {
+		String sql = "UPDATE videos SET views = views + 1 WHERE location_url = ?;";
+		try (PreparedStatement ps = con.prepareStatement(sql);) {
+			ps.setString(1, videoURL);
+			ps.executeUpdate();
+		}
+	}
+
+	public int getLikes(long videoId) throws SQLException {
+		String sql = "SELECT isLike FROM video_likes WHERE video_id = ?;";
+		int count = 0;
+		try (PreparedStatement ps = con.prepareStatement(sql);) {
+			ps.setLong(1, videoId);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				if (rs.getInt("isLike") == 1) {
+					count += rs.getInt("isLike");
+				}
+			}
+		}
+		return count;
+	}
+
+	public int getDisLikes(long videoId) throws SQLException {
+		String sql = "SELECT isLike FROM video_likes WHERE video_id = ?;";
+		int count = 0;
+		try (PreparedStatement ps = con.prepareStatement(sql);) {
+			ps.setLong(1, videoId);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				if (rs.getInt("isLike") == 0) {
+					count += rs.getInt("isLike");
+				}
+			}
+		}
+		return count;
 	}
 }

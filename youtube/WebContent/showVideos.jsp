@@ -4,16 +4,49 @@
 <!DOCTYPE html>
 <html>
 <head>
+<style type="text/css">
+div.inline { 
+	float:left; 
+	margin:5px;
+	padding: 5px;
+	border-style: solid; 
+	border-color: black; 
+	border-width: 1px;
+}
+</style>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>videos</title>
 </head>
 <body>
 	<c:forEach items="${requestScope.videos}" var="video">	
+	<div class="inline">
+		<c:out value="Name: ${video.name}"></c:out><br>
+		<c:out value="Description: ${video.description}"></c:out><br>
+		<c:out value="Owner: ${video.userName}"></c:out><br>
+		<c:out value="Published: ${video.date}"></c:out><br>
+		<c:out value="Views: ${video.views}"></c:out><br>
+		<c:out value="Privacy: ${video.privacy}"></c:out><br>
+		<c:out value="Tags: "></c:out><br>
+		<c:forEach items="${video.tags}" var="tag">	
+				<c:out value="#${tag.tag} "></c:out>
+		</c:forEach>
+		<br>
 		<a href="player?url=${video.locationUrl}">	
 			<video width="320" height="240">
-		  		<source src="video?url=${video.locationUrl}" type="video/mp4">
+		  		<source src="video?url=${video.locationUrl}&userId=${video.userId}" type="video/mp4">
 			</video>
-		</a>	
+		</a><br>
+		
+		
+		<form action="videoLike?like=1&videoId=${video.videoId}&userId=${sessionScope.user.userId}" method="post">
+			<c:out value="${video.likes}"></c:out>
+			<input type="submit" value="Like">
+		</form>
+		<form action="videoLike?like=-1&videoId=${video.videoId}&userId=${sessionScope.user.userId}" method="post">
+			<c:out value="${video.disLikes}"></c:out>
+			<input type="submit" value="Dislike">
+		</form>
+	</div>
 	</c:forEach>
 </body>
 </html>

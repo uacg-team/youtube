@@ -25,8 +25,13 @@ public class Video implements Serializable {
 	private String description;
 	private long privacyId;
 
+	private String userName;
+	private String privacy;
+	private int likes;
+	private int disLikes;
+	
 	private Set<Tag> tags = new HashSet<>();
-
+	
 	Video(long videoId, String name, int views, LocalDateTime date, String locationUrl, long userId,
 			String thumbnailUrl, String description, long privacyId, Set<Tag> tags) {
 		this.videoId = videoId;
@@ -40,7 +45,6 @@ public class Video implements Serializable {
 		this.privacyId = privacyId;
 		this.tags = tags;
 	}
-
 	public Video(String name, String locationUrl, long privacyId, long userId, Set<Tag> tags)
 			throws VideoException {
 		setName(name);
@@ -52,17 +56,37 @@ public class Video implements Serializable {
 		this.date = LocalDateTime.now();
 		this.views = 0;
 	}
-
 	public void addTag(Tag t) {
 		this.tags.add(t);
 	}
-
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Video other = (Video) obj;
+		if (videoId != other.videoId)
+			return false;
+		return true;
+	}
+	
 	public LocalDateTime getDate() {
 		return this.date;
 	}
-
+	
 	public String getDescription() {
 		return this.description;
+	}
+	public int getDisLikes() {
+		return disLikes;
+	}
+	
+	public int getLikes() {
+		return likes;
 	}
 
 	public String getLocationUrl() {
@@ -71,6 +95,10 @@ public class Video implements Serializable {
 
 	public String getName() {
 		return this.name;
+	}
+
+	public String getPrivacy() {
+		return privacy;
 	}
 
 	public long getPrivacyId() {
@@ -89,12 +117,24 @@ public class Video implements Serializable {
 		return this.userId;
 	}
 
+	public String getUserName() {
+		return userName;
+	}
+
 	public long getVideoId() {
 		return this.videoId;
 	}
 
 	public int getViews() {
 		return this.views;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (videoId ^ (videoId >>> 32));
+		return result;
 	}
 
 	public void removeTag(Tag t) {
@@ -110,6 +150,14 @@ public class Video implements Serializable {
 			throw new VideoException(VideoException.INVALID_DESCRIPTION);
 		}
 		this.description = description;
+	}
+
+	public void setDisLikes(int disLikes) {
+		this.disLikes = disLikes;
+	}
+
+	public void setLikes(int likes) {
+		this.likes = likes;
 	}
 
 	public void setLocationUrl(String locationUrl) throws VideoException {
@@ -129,13 +177,17 @@ public class Video implements Serializable {
 		this.name = name;
 	}
 	
+	public void setPrivacy(String privacy) {
+		this.privacy = privacy;
+	}
+	
 	public void setPrivacyId(long privacyId) throws VideoException {
 		if (privacyId < 1) {
 			throw new VideoException(VideoException.INVALID_PRIVACY);
 		}
 		this.privacyId = privacyId;
 	}
-	
+
 	public void setTags(Set<Tag> tags) {
 		this.tags = tags;
 	}
@@ -154,34 +206,16 @@ public class Video implements Serializable {
 		this.userId = userId;
 	}
 
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	
 	public void setVideoId(long videoId) {
 		this.videoId = videoId;
 	}
 
 	public void setViews(int views) {
 		this.views = views;
-	}
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (videoId ^ (videoId >>> 32));
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Video other = (Video) obj;
-		if (videoId != other.videoId)
-			return false;
-		return true;
 	}
 
 	@Override

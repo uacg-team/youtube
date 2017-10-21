@@ -32,7 +32,8 @@ import model.exceptions.video.VideoException;
 public class UploadVideoServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	public static final String VIDEOS_URL = "C:/videos/";
+	public static final String ROOT = "C:/res";
+	public static final String VIDEOS_URL = "/videos";
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -49,11 +50,13 @@ public class UploadVideoServlet extends HttpServlet {
 		String name = request.getParameter("name");
 		String fileName = Paths.get(newVideo.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
 		InputStream fileContent = newVideo.getInputStream();	
-		File file = new File(VIDEOS_URL,fileName);
+		File file = new File(ROOT+"/userID"+u.getUserId()+VIDEOS_URL,fileName);
 		if(!file.exists()) {
+			file.mkdirs();
 			file.createNewFile();
 		}
-	    Path TO = Paths.get(VIDEOS_URL+fileName);	    
+		
+	    Path TO = Paths.get(file.getAbsolutePath());	    
 	    
 	    Files.copy(fileContent, TO,  StandardCopyOption.REPLACE_EXISTING);
 	    

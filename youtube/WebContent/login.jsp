@@ -24,7 +24,7 @@
 	      <c:if test="${requestScope.passwordError != null }">
 			<div style="color: red">
 				<c:out value="${requestScope.passwordError }"></c:out><br>
-				<a href="#"> Forgot password?</a>
+				<a href="#">Forgot password?</a>
 			</div>
 	      </c:if>
 	      <button type="submit">Login</button><br>
@@ -32,8 +32,5 @@
   		</form>
 </fieldset>
 <br>
-
-
-
 </body>
 </html>

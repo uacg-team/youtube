@@ -19,7 +19,6 @@ public class WelcomeServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		request.getRequestDispatcher("main").forward(request, response);
-		//response.sendRedirect("main");
 	}
 }
 

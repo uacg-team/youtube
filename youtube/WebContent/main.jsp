@@ -10,7 +10,15 @@
 <body>
 	<jsp:include page="header.jsp"></jsp:include><br>
 	
-	<h3>AllVideos</h3>
-	<jsp:include page="showVideos.jsp"></jsp:include><br>
+	<form action="main" method = "get">
+		<select name="sort">
+		  <option value="date"<c:if test="${requestScope.sort == \"date\" }"> selected </c:if>>SortByDate</option>
+		  <option value="like"<c:if test="${requestScope.sort == \"like\" }"> selected </c:if>>SortByLike</option>
+		</select>
+		<input type="submit" value="Sort">
+	</form>
+	<div>
+		<jsp:include page="showVideos.jsp"></jsp:include><br>
+	</div>
 </body>
 </html>

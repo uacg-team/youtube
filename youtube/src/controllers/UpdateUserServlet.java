@@ -28,10 +28,10 @@ public class UpdateUserServlet extends HttpServlet {
 
 		User u = (User) request.getSession().getAttribute("user");
 
-		String firstName = request.getParameter("firstName") == "" ? null : request.getParameter("firstName");
-		String lastName = request.getParameter("lastName") == "" ? null : request.getParameter("lastName");
-		String facebook = request.getParameter("facebook") == "" ? null : request.getParameter("facebook");
-		String avatarUrl = request.getParameter("avatarUrl") == "" ? u.getAvatarUrl()
+		String firstName = request.getParameter("firstName").equals("") ? null : request.getParameter("firstName");
+		String lastName = request.getParameter("lastName").equals("")  ? null : request.getParameter("lastName");
+		String facebook = request.getParameter("facebook").equals("")  ? null : request.getParameter("facebook");
+		String avatarUrl = request.getParameter("avatarUrl").equals("")  ? u.getAvatarUrl()
 				: request.getParameter("avatarUrl");
 		String gender = request.getParameter("gender") == "null" ? null : request.getParameter("gender");
 

@@ -35,20 +35,18 @@ public class LoginServlet extends HttpServlet {
 				request.getSession().setMaxInactiveInterval(-1);
 				request.getSession().setAttribute("user", u);
 				response.sendRedirect("main");
-				// request.getRequestDispatcher("main.jsp").forward(request, response);
 			} else {
 				request.setAttribute("passwordError", "Wrong Password");
-				request.getRequestDispatcher("login.jsp").forward(request, response);
 			}
 		} catch (SQLException e) {
-			response.getWriter().append("SQLException: " + e.getMessage());
+			request.setAttribute("error", e.getMessage());
+			request.getRequestDispatcher("login.jsp").forward(request, response);
 		} catch (UserNotFoundException e) {
-			request.setAttribute("usernameError", "User do not exists");
+			request.setAttribute("usernameError", e.getMessage());
 			request.getRequestDispatcher("login.jsp").forward(request, response);
 		} catch (UserException e) {
-			e.printStackTrace();
-		} finally {
-			
-		}
+			request.setAttribute("error", e.getMessage());
+			request.getRequestDispatcher("login.jsp").forward(request, response);
+		} 
 	}
 }

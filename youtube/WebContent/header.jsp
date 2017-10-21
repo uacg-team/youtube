@@ -31,6 +31,8 @@
 		<form action="profile" method="get">
 			<img src="image" width="50px" height="auto"/>
 				<c:out value="Welcome, ${user.username }"></c:out>
+			<br>
+			<input type="submit" value="My profile">
 		</form>
 		
 		<form action="updateUser" method="get">
