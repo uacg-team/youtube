@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -58,7 +60,7 @@ public class UploadVideoServlet extends HttpServlet {
 	    fileContent.close();
 		
 		String[] inputTags = request.getParameter("tags").split("\\s+");
-		ArrayList<Tag> tags = new ArrayList<>();
+		Set<Tag> tags = new HashSet<>();
 		for (String string : inputTags) {
 			tags.add(new Tag(string));
 		}

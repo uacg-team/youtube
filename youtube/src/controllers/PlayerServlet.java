@@ -3,6 +3,7 @@ package controllers;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -23,7 +24,7 @@ public class PlayerServlet extends HttpServlet {
 		try {
 			String videoURL = request.getParameter("url");
 			Video video = VideoDao.getInstance().getVideo(videoURL);
-			List<Video> related = VideoDao.getInstance().getRelatedVideos(video.getLocationUrl());
+			Set<Video> related = VideoDao.getInstance().getRelatedVideos(video.getLocationUrl());
 			request.setAttribute("mainVideo", video);
 			request.setAttribute("related", related);
 			request.getRequestDispatcher("player.jsp").forward(request, response);

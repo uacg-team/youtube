@@ -27,7 +27,8 @@ public class MyVideosServlet extends HttpServlet {
 			
 			request.getRequestDispatcher("myprofile.jsp").forward(request, response);
 		}catch (SQLException e) {
-			e.printStackTrace();
+			request.setAttribute("error", e.getMessage());
+			request.getRequestDispatcher("myprofile.jsp").forward(request, response);
 		}
 	}
 

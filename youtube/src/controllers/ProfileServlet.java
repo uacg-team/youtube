@@ -36,15 +36,14 @@ public class ProfileServlet extends HttpServlet {
 			request.setAttribute("followers", followers);
 			request.setAttribute("following", following);
 			request.setAttribute("videos", myVideos);
-			//throw new UserException("testing");
 		} catch (SQLException e) {
 			request.setAttribute("error", "SQL: " + e.getMessage());
 		} catch (UserNotFoundException e) {
 			request.setAttribute("error", "UserNotFound");
 		} catch (UserException e) {
 			request.setAttribute("error", "User: " + e.getMessage());
-		}finally {
-			request.getRequestDispatcher("profile.jsp").forward(request, response);
+		} finally {
+			request.getRequestDispatcher("myprofile.jsp").forward(request, response);
 		}
 	}
 }
