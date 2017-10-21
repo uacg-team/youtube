@@ -66,10 +66,13 @@ public class CommentServlet extends HttpServlet {
 				// load likes dislikes for comment:
 				c.setLikes(CommentDao.getInstance().getLikes(c.getCommentId()));
 				c.setDislikes(CommentDao.getInstance().getDislikes(c.getCommentId()));
-				// load likes dislikes for reply:
+				//load user info for comment:
+				CommentDao.getInstance().loadUserInfo(c);
+				// load likes dislikes for reply, and user info:
 				for (Comment reply : replies) {
 					reply.setLikes(CommentDao.getInstance().getLikes(reply.getCommentId()));
 					reply.setDislikes(CommentDao.getInstance().getDislikes(reply.getCommentId()));
+					CommentDao.getInstance().loadUserInfo(reply);
 				}
 			}
 			request.setAttribute("comments", comments);

@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import model.CommentDao;
 import model.User;
-import model.Video;
 import model.exceptions.comments.CommentException;
 import model.exceptions.user.UserException;
 

@@ -108,3 +108,7 @@ margin: 5px 0;
   font-weight: bold;
   font-size: 12px;
 }
+.like-buttons{
+	float: left;
+	display: inline;
+}

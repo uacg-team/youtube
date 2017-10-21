@@ -21,6 +21,11 @@ public class Comment {
 	private long likes;
 	private long dislikes;
 	
+	//userInfo
+	private String username;
+	private String url;
+	
+	
 	/**
 	 * get all fields default, use only by CommentDAO
 	 */
@@ -133,4 +138,21 @@ public class Comment {
 	public long getLikes() {
 		return likes;
 	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	
 }

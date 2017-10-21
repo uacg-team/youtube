@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -19,7 +20,8 @@ import model.utils.DateTimeConvertor;
 public class CommentDao {
 	private final Connection con;
 	private static CommentDao instance;
-
+	public static final Comparator<Comment> ASC_BY_DATE = (o1,o2)->o1.getDate().compareTo(o2.getDate());
+	public static final Comparator<Comment> DESC_BY_DATE = (o1,o2)->o2.getDate().compareTo(o1.getDate());
 	private CommentDao() {
 		con = DBConnection.CON1.getConnection();
 	}
@@ -406,6 +408,19 @@ public class CommentDao {
 				rs.next();
 				int dislikes = rs.getInt(1);
 				return dislikes;
+			}
+		}
+	}
+	public void loadUserInfo(Comment comment) throws SQLException {
+		String sql="select u.username, u.avatar_url as url from users as u "
+				+ "inner join comments as c on(c.user_id=u.user_id) where comment_id=?;";
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, comment.getCommentId());
+			try (ResultSet rs = ps.executeQuery()) {
+				if(rs.next()) {
+					comment.setUsername(rs.getString("username"));
+					comment.setUrl(rs.getString("url"));
+				}
 			}
 		}
 	}
