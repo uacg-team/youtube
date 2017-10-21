@@ -17,6 +17,26 @@ public class Tag implements Serializable{
 	public Tag(String tag) {
 		this.tag = tag;
 	}
+	
+	public String getTag() {
+		return tag;
+	}
+	
+	public long getTag_id() {
+		return tag_id;
+	}
+
+	public void setTag_id(long tag_id) {
+		this.tag_id = tag_id;
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((tag == null) ? 0 : tag.hashCode());
+		return result;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -34,23 +54,9 @@ public class Tag implements Serializable{
 			return false;
 		return true;
 	}
-	
-	public String getTag() {
-		return tag;
-	}
-	
-	public long getTag_id() {
-		return tag_id;
-	}
-
-	public void setTag_id(long tag_id) {
-		this.tag_id = tag_id;
-	}
 
 	@Override
 	public String toString() {
 		return "Tag [tag=" + tag + "]";
 	}
-	
-	
 }

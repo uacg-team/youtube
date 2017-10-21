@@ -3,18 +3,17 @@ package model;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import model.exceptions.user.UserException;
 import model.exceptions.video.VideoException;
 
 
 public class Video implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8280893850472988879L;
+	private static final long serialVersionUID = 1L;
+	
 	private static final int MIN_NAME_LENGTH = 3;
 	private long videoId;
 	private String name;
@@ -26,11 +25,10 @@ public class Video implements Serializable {
 	private String description;
 	private long privacyId;
 
-	private List<Tag> tags = new ArrayList<>();
-
+	private Set<Tag> tags = new HashSet<>();
 
 	Video(long videoId, String name, int views, LocalDateTime date, String locationUrl, long userId,
-			String thumbnailUrl, String description, long privacyId, List<Tag> tags) {
+			String thumbnailUrl, String description, long privacyId, Set<Tag> tags) {
 		this.videoId = videoId;
 		this.name = name;
 		this.views = views;
@@ -43,7 +41,7 @@ public class Video implements Serializable {
 		this.tags = tags;
 	}
 
-	public Video(String name, String locationUrl, long privacyId, long userId, List<Tag> tags)
+	public Video(String name, String locationUrl, long privacyId, long userId, Set<Tag> tags)
 			throws VideoException {
 		setName(name);
 		setLocationUrl(locationUrl);
@@ -79,7 +77,7 @@ public class Video implements Serializable {
 		return this.privacyId;
 	}
 
-	public List<Tag> getTags() {
+	public Set<Tag> getTags() {
 		return this.tags;
 	}
 
@@ -138,7 +136,7 @@ public class Video implements Serializable {
 		this.privacyId = privacyId;
 	}
 	
-	public void setTags(List<Tag> tags) {
+	public void setTags(Set<Tag> tags) {
 		this.tags = tags;
 	}
 
@@ -162,6 +160,28 @@ public class Video implements Serializable {
 
 	public void setViews(int views) {
 		this.views = views;
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (videoId ^ (videoId >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Video other = (Video) obj;
+		if (videoId != other.videoId)
+			return false;
+		return true;
 	}
 
 	@Override

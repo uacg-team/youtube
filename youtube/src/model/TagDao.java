@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import model.exceptions.tags.TagNotFoundException;
 import model.utils.DBConnection;
@@ -56,7 +57,7 @@ public class TagDao {
 	}
 
 	public void insertVideoTags(Video v) throws SQLException, TagNotFoundException {
-		List<Tag> tags = v.getTags();
+		Set<Tag> tags = v.getTags();
 		
 		String insert_into_videos_has_tags = "INSERT INTO videos_has_tags (video_id, tag_id) values (?, ?)";
 
