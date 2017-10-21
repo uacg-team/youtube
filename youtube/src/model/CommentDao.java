@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import model.exceptions.comments.CommentException;
 import model.exceptions.comments.CommentNotFoundException;
@@ -69,6 +70,7 @@ public class CommentDao {
 	 *             -if cant update in db
 	 */
 	public void updateComment(Comment comment) throws SQLException, CommentException {
+		//if comment was deleted from another user before load page
 		String foundComment = "select comment_id from comments where comment_id=?;";
 		try (PreparedStatement ps = con.prepareStatement(foundComment)) {
 			ps.setLong(1, comment.getCommentId());
@@ -108,15 +110,29 @@ public class CommentDao {
 	 * @throws SQLException
 	 */
 	public int deleteComment(long commentId) throws CommentException, SQLException {
-		int count;
-		count = deleteAllRepliesToComment(commentId);
-		// TODO delete all likes and dislikes
-		String sql = "delete from comments where comment_id=?";
-		try (PreparedStatement ps = con.prepareStatement(sql)) {
-			ps.setLong(1, commentId);
-			count += ps.executeUpdate();
-			return count;
+		int count=0;
+		synchronized (con) {
+			try {
+				con.setAutoCommit(false);
+				
+				deleteAllLikesForCommentAndReplies(commentId);
+				
+				count = deleteAllRepliesToComment(commentId);
+				
+				String sql = "delete from comments where comment_id=?";
+				try (PreparedStatement ps = con.prepareStatement(sql)) {
+					ps.setLong(1, commentId);
+					count += ps.executeUpdate();
+				}
+				con.commit();
+			}catch(SQLException e) {
+				con.rollback();
+				throw new SQLException(e);
+			}finally {
+				con.setAutoCommit(true);
+			}
 		}
+		return count;
 	}
 
 	/**
@@ -129,39 +145,30 @@ public class CommentDao {
 		String sql = "delete from comments where comment_id in "
 				+ "(select * from (select r.comment_id from comments as c "
 				+ "inner join comments as r on (r.reply_id = c.comment_id) where c.comment_id=?) as d);";
+		int count=0;
 		try (PreparedStatement ps = con.prepareStatement(sql)) {
 			ps.setLong(1, commentId);
-			int count = ps.executeUpdate();
-			ps.close();
-			return count;
+			count = ps.executeUpdate();
 		}
+		return count;
 	}
-
-	@SuppressWarnings("unused")
-	@Deprecated
-	/**
-	 * @param c
-	 * @return count deleted comments
-	 * @throws SQLException
-	 * @throws CommentException
-	 */
-	private int deleteAllRepliesToComments(ArrayList<Integer> commentIds) throws SQLException {
-		if (commentIds == null || commentIds.isEmpty()) {
-			throw new NullPointerException("ArrayList comments_id is empty");
-		}
-		StringBuilder prepareStatement = new StringBuilder();
-		for (int i : commentIds) {
-			prepareStatement.append("c.comment_id=" + i + " or ");
-		}
-		// because " or " is 4 symbols -1 = 3
-		String statement = prepareStatement.substring(0, prepareStatement.length() - 3);
-		// There is no risk for sql injection because input is only integers!
-		String sql = "delete from comments where comment_id in "
+	//use in transaction!
+	private int deleteAllLikesForCommentAndReplies(long commentId) throws SQLException {
+		//delete all likes for replies
+		String sql1 = "delete from comments_likes where comment_id in "
 				+ "(select * from (select r.comment_id from comments as c "
-				+ "inner join comments as r on (r.reply_id = c.comment_id) where " + statement + " ) as d);";
-		PreparedStatement ps = con.prepareStatement(sql);
-		int count = ps.executeUpdate();
-		ps.close();
+				+ "inner join comments as r on (r.replay_id = c.comment_id) where c.comment_id=?) as d);";
+		//delete all likes for comment
+		String sql2 = "delete from comments_likes where comment_id=?";
+		int count =0;
+		try (PreparedStatement ps = con.prepareStatement(sql1)) {
+			ps.setLong(1, commentId);
+			count = ps.executeUpdate();
+		}
+		try (PreparedStatement ps = con.prepareStatement(sql2)) {
+			ps.setLong(1, commentId);
+			count += ps.executeUpdate();
+		}
 		return count;
 	}
 
@@ -173,18 +180,35 @@ public class CommentDao {
 	 */
 	public int deleteComments(long videoId) throws SQLException {
 		int count = 0;
-		// TODO delete comments likes
-		String deleteReplies = "delete from comments where video_id = ? and reply_id is not null;";
-		String deleteComments = "delete from comments where video_id = ?";
-		try (PreparedStatement ps = con.prepareStatement(deleteReplies)) {
-			ps.setLong(1, videoId);
-			count += ps.executeUpdate();
+		synchronized (con) {
+			try {
+				con.setAutoCommit(false);
+				String deleteLikes = "delete from comments_likes where comment_id in "
+						+ "(select * from (select c.comment_id from comments as c "
+						+ "inner join videos as v on (v.video_id = c.video_id) " 
+						+ "where c.video_id=?) as co);";
+				String deleteReplies = "delete from comments where video_id = ? and reply_id is not null;";
+				String deleteComments = "delete from comments where video_id = ?";
+				try (PreparedStatement ps = con.prepareStatement(deleteLikes)) {
+					ps.setLong(1, videoId);
+				}
+				try (PreparedStatement ps = con.prepareStatement(deleteReplies)) {
+					ps.setLong(1, videoId);
+					count += ps.executeUpdate();
+				}
+				try (PreparedStatement ps = con.prepareStatement(deleteComments)) {
+					ps.setLong(1, videoId);
+					count += ps.executeUpdate();
+				}
+				con.commit();
+			} catch(SQLException e){
+				con.rollback();
+				throw new SQLException(e);
+			}finally {
+				con.setAutoCommit(true);
+			}
 		}
-		try (PreparedStatement ps = con.prepareStatement(deleteComments)) {
-			ps.setLong(1, videoId);
-			count += ps.executeUpdate();
-			return count;
-		}
+		return count;
 	}
 
 	/**
@@ -383,6 +407,18 @@ public class CommentDao {
 				int dislikes = rs.getInt(1);
 				return dislikes;
 			}
+		}
+	}
+
+	public static void main(String[] args) throws SQLException, CommentException {
+		// generating comments
+		for (int i = 0; i < 15; i++) {
+			CommentDao.getInstance().createComment(new Comment("comment" + i, LocalDateTime.now(), 1, 1, 0));
+		}
+		// replies
+		for (int i = 0; i < 15; i++) {
+			CommentDao.getInstance()
+					.createComment(new Comment("reply" + i, LocalDateTime.now(), 1, 1, 1 + new Random().nextInt(15)));
 		}
 	}
 }

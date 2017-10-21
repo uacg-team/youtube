@@ -13,8 +13,13 @@ public class Comment {
 	private long videoId;
 	private long replyId;
 
+	// replies
 	private List<Comment> replies;
 	private boolean hasReplies;
+
+	// likes/dislikes
+	private long likes;
+	private long dislikes;
 
 	/**
 	 * get all fields default, use only by CommentDAO
@@ -111,5 +116,21 @@ public class Comment {
 
 	public boolean getHasReplies() {
 		return hasReplies;
+	}
+
+	public void setLikes(long likes) {
+		this.likes = likes;
+	}
+
+	public void setDislikes(long dislikes) {
+		this.dislikes = dislikes;
+	}
+
+	public long getDislikes() {
+		return dislikes;
+	}
+
+	public long getLikes() {
+		return likes;
 	}
 }
