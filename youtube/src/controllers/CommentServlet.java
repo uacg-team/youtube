@@ -20,17 +20,9 @@ import model.exceptions.video.VideoException;
 /**
  * Servlet implementation class CommentServlet
  */
-@WebServlet("/test")
+@WebServlet("/comment")
 public class CommentServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-//TODO	long videoId = ((Video)request.getAttribute("mainVideo")).getVideoId();
-		long videoId = 2;
-		CommentServlet.loadCommentsForVideo(request,videoId);
-		request.getRequestDispatcher("comments.jsp").forward(request, response);
-	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -56,8 +48,8 @@ public class CommentServlet extends HttpServlet {
 			} catch (SQLException e) {
 				//TODO handle
 			}
+			response.sendRedirect("player?url="+request.getParameter("url"));
 		}
-		doGet(request, response);
 	}
 
 	public static HttpServletRequest loadCommentsForVideo(HttpServletRequest request,long videoId) {

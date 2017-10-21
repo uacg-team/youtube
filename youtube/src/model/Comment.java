@@ -20,7 +20,7 @@ public class Comment {
 	// likes/dislikes
 	private long likes;
 	private long dislikes;
-
+	
 	/**
 	 * get all fields default, use only by CommentDAO
 	 */
