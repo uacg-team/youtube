@@ -18,6 +18,7 @@ public class WelcomeServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		request.setAttribute("search", null);
 		request.getRequestDispatcher("main").forward(request, response);
 	}
 }

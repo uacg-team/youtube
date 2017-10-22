@@ -4,9 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLType;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,10 +84,8 @@ public class UserDao {
 			ps.setString(5, u.getLastName());
 			ps.setString(6, u.getAvatarUrl());
 			ps.setString(7, u.getGender());
-//			ps.setNull(7, Types.VARCHAR);
 			ps.setLong(8, u.getUserId());
 			int affectedRows = ps.executeUpdate();
-			
 			if (affectedRows == 0) {
 				throw new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND);
 			}
