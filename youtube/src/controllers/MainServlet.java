@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import model.Video;
 import model.VideoDao;
+import model.exceptions.video.VideoException;
 
 @WebServlet("/main")
 public class MainServlet extends HttpServlet {
@@ -19,36 +20,45 @@ public class MainServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
+		List<Video> videos = null;
 		try {
-			List<Video> videos = null;
-			String param = request.getParameter("sort");
-			
-			if (param == null) {
-				videos = VideoDao.getInstance().getAllVideoOrderByDate();
-				request.setAttribute("sort", "date");
+			String search = request.getParameter("search");
+			if (search != null) {
+				videos = VideoDao.getInstance().searchVideo(search);
 			}else {
-				if (param.equals("date")) {
+				String param = request.getParameter("sort");
+				if (param == null) {
 					videos = VideoDao.getInstance().getAllVideoOrderByDate();
 					request.setAttribute("sort", "date");
-				}
-
-				if (param.equals("like")) {
-					videos = VideoDao.getInstance().getAllVideoOrderByLikes();
-					request.setAttribute("sort", "like");
+				} else {
+					if (param.equals("date")) {
+						videos = VideoDao.getInstance().getAllVideoOrderByDate();
+						request.setAttribute("sort", "date");
+					}
+					if (param.equals("like")) {
+						videos = VideoDao.getInstance().getAllVideoOrderByLikes();
+						request.setAttribute("sort", "like");
+					}
+					if (param.equals("view")) {
+						videos = VideoDao.getInstance().getAllVideoOrderByViews();
+						request.setAttribute("sort", "view");
+					}
 				}
 			}
-			
+
 			for (Video video : videos) {
 				video.setUserName(VideoDao.getInstance().getUserName(video.getUserId()));
 				video.setPrivacy(VideoDao.getInstance().getPrivacy(video.getPrivacyId()));
 				video.setLikes(VideoDao.getInstance().getLikes(video.getVideoId()));
 				video.setDisLikes(VideoDao.getInstance().getDisLikes(video.getVideoId()));
 			}
-			
+
 			request.setAttribute("videos", videos);
 			request.getRequestDispatcher("main.jsp").forward(request, response);
-		}catch (SQLException e) {
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (VideoException e) {
 			e.printStackTrace();
 		}
 	}

@@ -14,7 +14,7 @@
 		<div>
 			<a href="viewProfile?username=${user.username}">
 				<img src="img?path=${user.avatarUrl}" width="50px" height="auto"/>
-				<p><c:out value="${user.username}"></c:out></p>
+				<c:out value="${user.username}"></c:out>
 			</a>
 		</div>
 		</c:forEach>

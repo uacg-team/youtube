@@ -32,8 +32,8 @@ div.inline {
 		</c:forEach>
 		<br>
 		<a href="player?url=${video.locationUrl}" id="preview">	
-			<video width="320" height="240" preload="auto">
-		  		<source src="video?url=${video.locationUrl}&userId=${video.userId}#t=20" type="video/mp4">
+			<video width="320" height="240" preload="none">
+		  		<source src="video?url=${video.locationUrl}&userId=${video.userId}" type="video/mp4">
 			</video>
 		</a><br>
 		

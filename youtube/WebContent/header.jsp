@@ -6,43 +6,68 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>header</title>
+<style type="text/css">
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #e7e7e7;
+    background-color: #f3f3f3;
+}
+
+li {
+	vertical-align: middle;
+	position:relative;
+    float: left;
+    text-align: center;
+}
+
+li a {
+    display: block;
+    color: #666;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+/* Change the link color to #111 (black) on hover */
+li a:hover {
+    background-color: #ffffff;
+}
+</style>
 </head>
 <body>
 	
-   	<a href="main">
-   		<img src="logo.png" style="width: 200px; height: auto">
-	</a>
-	
+<ul>
+	<li>
+  		<a href="main"><img src="logo.png" style="width: 200px; height: auto"></a>
+	</li>
 	<c:if test="${sessionScope.user == null}"> 
-		<form action="login" method="get">
-			<input type="submit" value="Login">
-		</form>
-		
-		<form action="register" method="get">
-			<input type="submit" value="Register">
-		</form>
+		<li><a href="login">Login</a></li>
+		<li><a href="register">Register</a></li>
 	</c:if>
+	<li><a href="upload">Upload</a></li>
 	
-	<form action="upload" method="get">
-		<input type="submit" value="Upload">
-	</form>
+	
+	<li>
+		<form action="main" method="get">
+			<input type="text" name="search" placeholder="Search..">
+		</form>
+	</li>
+		
 	
 	<c:if test="${ sessionScope.user != null}"> 
-		<img src="image" width="50px" height="auto"/>
-		<c:out value="Welcome, ${user.username}"></c:out>
-		
-		<form action="profile">
-			<input type="submit" value="My profile">
-		</form>
-		
-		<form action="updateUser" method="get">
-			<input type="submit" value="Update user">
-		</form>
-		
-		<form action="logout" method="get">
-			<input type="submit" value="Logout">
-		</form>
+	<li>
+		<a href="viewProfile?username=${sessionScope.user.username}">
+			<img src="image" width="50px" height="auto"/>
+			<c:out value="${sessionScope.user.username}"></c:out>
+		</a>
+	</li>
+	<li><a href="updateUser">Update user</a></li>
+	<li><a href="logout">Logout</a></li>
 	</c:if>
-
+</ul>
+<br>
 </body>
 </html>

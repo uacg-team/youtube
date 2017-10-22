@@ -195,6 +195,28 @@ public class VideoDao {
 		}
 	}
 
+	public List<Video> getAllVideoOrderByViews() throws SQLException {
+		String sql = "SELECT * FROM videos WHERE privacy_id = 1 ORDER BY views DESC LIMIT 6;";
+		try (PreparedStatement ps = con.prepareStatement(sql);) {
+			ResultSet rs = ps.executeQuery();
+			List<Video> videos = new ArrayList<>();
+			while (rs.next()) {
+				videos.add(
+						new Video(
+								rs.getLong("video_id"), 
+								rs.getString("name"), 
+								rs.getInt("views"),
+								DateTimeConvertor.sqlToLdt(rs.getString("date")),
+								rs.getString("location_url"), 
+								rs.getLong("user_id"), 
+								rs.getString("thumbnail_url"),
+								rs.getString("description"), 
+								rs.getLong("privacy_id"), 
+								getTags(rs.getString("location_url"))));
+			}
+			return videos;
+		}
+	}
 	
 	public List<Video> getAllVideoOrderByLikes() throws SQLException {
 		String sql = "SELECT v.video_id, v.name, v.views, v.date, v.location_url, v.user_id, v.thumbnail_url, v.description, v.privacy_id, SUM(video_likes.isLike) AS likes FROM videos as v LEFT JOIN video_likes USING (video_id) GROUP BY video_id ORDER BY SUM(video_likes.isLike) DESC LIMIT 6;";
@@ -270,6 +292,40 @@ public class VideoDao {
 		}
 	}
 
+	public List<Video> getPublicVideos(long user_id) throws SQLException {
+		String sql = "Select * FROM videos WHERE privacy_id = 1 AND user_id = ?;";
+		List<Video> allUserVideos = new ArrayList<>();
+		try (PreparedStatement ps = con.prepareStatement(sql);) {
+			ps.setLong(1, user_id);
+			ResultSet rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				Set<Tag> tags = new HashSet<>();
+				String getTags = "SELECT tags.tag FROM videos_has_tags JOIN tags USING (tag_id) WHERE videos_has_tags.video_id = ? ;";
+				PreparedStatement ps_tags = con.prepareStatement(getTags);
+				ps_tags.setLong(1, rs.getLong("video_id"));
+				ResultSet rs1 = ps_tags.executeQuery();
+				while (rs1.next()) {
+					tags.add(new Tag(rs1.getString("tag")));
+				}
+				
+				allUserVideos.add(
+						new Video(
+								rs.getLong("video_id"), 
+								rs.getString("name"), 
+								rs.getInt("views"),
+								DateTimeConvertor.sqlToLdt(rs.getString("date")),
+								rs.getString("location_url"), 
+								rs.getLong("user_id"), 
+								rs.getString("thumbnail_url"),
+								rs.getString("description"), 
+								rs.getLong("privacy_id"), 
+								tags));
+			}
+		}
+		return allUserVideos;
+	}
+	
 	public List<Video> getVideos(long user_id) throws SQLException {
 		String sql = "Select * FROM videos WHERE user_id = ?;";
 		List<Video> allUserVideos = new ArrayList<>();
@@ -324,7 +380,7 @@ public class VideoDao {
 	}
 
 	public List<Video> searchVideo(String name) throws SQLException, VideoException {
-		String sql = "SELECT * FROM videos WHERE name LIKE ?";
+		String sql = "SELECT * FROM videos WHERE name LIKE ? and privacy_id = 1";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
 			ps.setString(1, "%" + name + "%");
 			ResultSet rs = ps.executeQuery();

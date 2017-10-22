@@ -14,7 +14,8 @@
 	<form action="main" method = "get">
 		<select name="sort">
 		  <option value="date"<c:if test="${requestScope.sort == \"date\" }"> selected </c:if>>SortByDate</option>
-		  <option value="like"<c:if test="${requestScope.sort == \"like\" }"> selected </c:if>>SortByLike</option>
+		  <option value="like"<c:if test="${requestScope.sort == \"like\" }"> selected </c:if>>SortByLikes</option>
+		  <option value="view"<c:if test="${requestScope.sort == \"view\" }"> selected </c:if>>SortByViews</option>
 		</select>
 		<input type="submit" value="Sort">
 	</form>

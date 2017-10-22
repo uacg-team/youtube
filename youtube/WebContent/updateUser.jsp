@@ -36,9 +36,9 @@
  		<input type="submit" value="Update">
 	</form>
 	
-	<form action="profile" method="get">
-		<input type="submit" value="Go to profile">
-	</form>
+	<a href="viewProfile?username=${user.username}">
+		<button>Go to profile</button>
+	</a>
 		
  	<c:if test="${requestScope.UserException != null }">
 		<div style="color: red">

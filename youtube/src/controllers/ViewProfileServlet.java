@@ -23,7 +23,7 @@ public class ViewProfileServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String un  = request.getParameter("username");
-		System.out.println(un);
+		User loggedUser = (User) request.getSession().getAttribute("user");
 		User u = null;
 		try {
 			u = UserDao.getInstance().getUser(un);
@@ -34,11 +34,22 @@ public class ViewProfileServlet extends HttpServlet {
 		} catch (UserException e1) {
 			e1.printStackTrace();
 		}
-		System.out.println("viewProfileSurvlet:User:" + u);
 		try {
 			List<User> followers = UserDao.getInstance().getFollowers(u.getUserId());
 			List<User> following = UserDao.getInstance().getFollowing(u.getUserId());
-			List<Video> videos = VideoDao.getInstance().getVideos(u.getUserId());
+			List<Video> videos = null;
+			if (u.getUserId() == loggedUser.getUserId()) {
+				videos = VideoDao.getInstance().getVideos(u.getUserId());
+			} else {
+				videos = VideoDao.getInstance().getPublicVideos(u.getUserId());
+			}
+			for (Video video : videos) {
+				video.setUserName(VideoDao.getInstance().getUserName(video.getUserId()));
+				video.setPrivacy(VideoDao.getInstance().getPrivacy(video.getPrivacyId()));
+				video.setLikes(VideoDao.getInstance().getLikes(video.getVideoId()));
+				video.setDisLikes(VideoDao.getInstance().getDisLikes(video.getVideoId()));
+			}
+			request.setAttribute("user", u);
 			request.setAttribute("followers", followers);
 			request.setAttribute("following", following);
 			request.setAttribute("videos", videos);
