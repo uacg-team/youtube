@@ -19,6 +19,7 @@ public class MainServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		
 		try {
 			List<Video> videos = null;
 			String param = request.getParameter("sort");
@@ -44,6 +45,7 @@ public class MainServlet extends HttpServlet {
 				video.setLikes(VideoDao.getInstance().getLikes(video.getVideoId()));
 				video.setDisLikes(VideoDao.getInstance().getDisLikes(video.getVideoId()));
 			}
+			
 			request.setAttribute("videos", videos);
 			request.getRequestDispatcher("main.jsp").forward(request, response);
 		}catch (SQLException e) {

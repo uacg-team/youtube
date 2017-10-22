@@ -173,7 +173,7 @@ public class VideoDao {
 	}
 	
 	public List<Video> getAllVideoOrderByDate() throws SQLException {
-		String sql = "SELECT * FROM videos WHERE privacy_id = 1 ORDER BY date DESC;";
+		String sql = "SELECT * FROM videos WHERE privacy_id = 1 ORDER BY date DESC LIMIT 6;";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
 			ResultSet rs = ps.executeQuery();
 			List<Video> videos = new ArrayList<>();
@@ -197,7 +197,7 @@ public class VideoDao {
 
 	
 	public List<Video> getAllVideoOrderByLikes() throws SQLException {
-		String sql = "SELECT v.video_id, v.name, v.views, v.date, v.location_url, v.user_id, v.thumbnail_url, v.description, v.privacy_id, SUM(video_likes.isLike) AS likes FROM videos as v LEFT JOIN video_likes USING (video_id) GROUP BY video_id ORDER BY SUM(video_likes.isLike) DESC;";
+		String sql = "SELECT v.video_id, v.name, v.views, v.date, v.location_url, v.user_id, v.thumbnail_url, v.description, v.privacy_id, SUM(video_likes.isLike) AS likes FROM videos as v LEFT JOIN video_likes USING (video_id) GROUP BY video_id ORDER BY SUM(video_likes.isLike) DESC LIMIT 6;";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
 			ResultSet rs = ps.executeQuery();
 
