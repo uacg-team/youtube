@@ -12,11 +12,13 @@
 <body>
 	<c:if test="${sessionScope.user!=null}">
 	<b><c:out value="${sessionScope.user.username}"></c:out></b>
-	<img src="img?path=${sessionScope.user.avatarUrl}" width="50px" height="auto"/>
+	<img src="img?path=${sessionScope.user.avatarUrl}&userId=${sessionScope.user.userId}" width="50px" height="auto"/>
 	</c:if>
+	<%-- 	
 	<c:if test="${sessionScope.user==null}">
 	<img src="img?path=defaultAvatar.png" width="50px" height="auto"/>
 	</c:if>
+	 --%>
 	<form action="comment?videoId=${requestScope.mainVideo.videoId}&url=${requestScope.mainVideo.locationUrl}" method="post">
 		New Comment<input type="text" placeholder="add comment" name="newComment"/>
 		<input type="submit" value="comment"/>
@@ -30,7 +32,7 @@
 	<br>
 	<br>
 	<c:forEach items="${requestScope.comments}" var="comment">
-	<img src="img?path=${comment.url}" width="50px" height="auto"/>
+	<img src="img?path=${comment.url}&userId=${comment.userId}" width="50px" height="auto"/>
 	<div class="comment-box">
  					<p class="comment-header"><span>${comment.username}</span></p>
 					<div class="comment-box-inner"> 

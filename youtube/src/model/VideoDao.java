@@ -139,16 +139,6 @@ public class VideoDao {
 		ps.executeUpdate();
 	}
 
-	public boolean existLikeDislike(long video_id, long user_id) throws SQLException {
-		String sql = "Select * FROM video_likes WHERE video_id = ? AND user_id = ?;";
-		try (PreparedStatement ps = con.prepareStatement(sql);) {
-			ps.setLong(1, video_id);
-			ps.setLong(2, user_id);
-			ResultSet rs = ps.executeQuery();
-			return rs.next();
-		}
-	}
-
 	public boolean existsVideo(long video_id) throws SQLException {
 		String sql = "SELECT COUNT(*) FROM videos WHERE video_id=?;";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
@@ -173,7 +163,7 @@ public class VideoDao {
 	}
 	
 	public List<Video> getAllVideoOrderByDate() throws SQLException {
-		String sql = "SELECT * FROM videos WHERE privacy_id = 1 ORDER BY date DESC LIMIT 6;";
+		String sql = "SELECT * FROM videos WHERE privacy_id = 1 ORDER BY date DESC;";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
 			ResultSet rs = ps.executeQuery();
 			List<Video> videos = new ArrayList<>();
@@ -196,7 +186,7 @@ public class VideoDao {
 	}
 
 	public List<Video> getAllVideoOrderByViews() throws SQLException {
-		String sql = "SELECT * FROM videos WHERE privacy_id = 1 ORDER BY views DESC LIMIT 6;";
+		String sql = "SELECT * FROM videos WHERE privacy_id = 1 ORDER BY views DESC;";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
 			ResultSet rs = ps.executeQuery();
 			List<Video> videos = new ArrayList<>();
@@ -219,7 +209,7 @@ public class VideoDao {
 	}
 	
 	public List<Video> getAllVideoOrderByLikes() throws SQLException {
-		String sql = "SELECT v.video_id, v.name, v.views, v.date, v.location_url, v.user_id, v.thumbnail_url, v.description, v.privacy_id, SUM(video_likes.isLike) AS likes FROM videos as v LEFT JOIN video_likes USING (video_id) GROUP BY video_id ORDER BY SUM(video_likes.isLike) DESC LIMIT 6;";
+		String sql = "SELECT v.video_id, v.name, v.views, v.date, v.location_url, v.user_id, v.thumbnail_url, v.description, v.privacy_id, SUM(video_likes.isLike) AS likes FROM videos as v LEFT JOIN video_likes USING (video_id) GROUP BY video_id ORDER BY SUM(video_likes.isLike) DESC;";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
 			ResultSet rs = ps.executeQuery();
 
@@ -287,7 +277,7 @@ public class VideoDao {
 		} catch (SQLException e) {
 			con.rollback();
 			throw new SQLException(e);
-		}finally {
+		} finally {
 			con.setAutoCommit(true);
 		}
 	}
@@ -360,21 +350,26 @@ public class VideoDao {
 		return allUserVideos;
 	}
 
-	public boolean hasLike(long video_id, long user_id) throws SQLException {
-		String sql = "Select isLike FROM video_likes WHERE video_id = ? AND user_id = ?;";
-		try (PreparedStatement ps = con.prepareStatement(sql);) {
-			ps.setLong(1, video_id);
-			ps.setLong(2, user_id);
-			ResultSet rs = ps.executeQuery();
-			return rs.getBoolean("isLike");
+	public void like(long videoId, long userId) throws SQLException {
+		String sql = "SELECT isLike FROM video_likes WHERE user_id = ? AND video_id = ?;";
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, userId);
+			ps.setLong(2, videoId);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (!rs.next()) {
+					sql = "INSERT INTO video_likes (video_id,user_id,isLike) VALUES (?,?,1)";
+				} else {
+					if (rs.getBoolean(1)) {
+						sql = "DELETE FROM video_likes WHERE user_id = ? AND video_id = ?";
+					} else {
+						sql = "UPDATE video_likes SET isLike = 1 WHERE user_id = ? AND video_id = ?";
+					}
+				}
+			}
 		}
-	}
-
-	public void like(long video_id, long user_id) throws SQLException {
-		String sql = "UPDATE video_likes SET isLike = 1 WHERE video_id = ? AND user_id = ?;";
-		try (PreparedStatement ps = con.prepareStatement(sql);) {
-			ps.setLong(1, video_id);
-			ps.setLong(2, user_id);
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setLong(1, userId);
+			ps.setLong(2, videoId);
 			ps.executeUpdate();
 		}
 	}

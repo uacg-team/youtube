@@ -26,14 +26,12 @@ import model.Video;
 import model.VideoDao;
 import model.exceptions.tags.TagNotFoundException;
 import model.exceptions.video.VideoException;
+import model.utils.Resources;
 
 @WebServlet("/upload")
 @MultipartConfig
 public class UploadVideoServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	
-	public static final String ROOT = "C:/res";
-	public static final String VIDEOS_URL = "/videos";
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -45,23 +43,12 @@ public class UploadVideoServlet extends HttpServlet {
 		// check if user is logged
 		
 		User u = (User) request.getSession().getAttribute("user");
-		Part newVideo = request.getPart("newVideo");
-		
-		
-		String name = request.getParameter("name");
-		String fileName = Paths.get(newVideo.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
-		InputStream fileContent = newVideo.getInputStream();	
-		File file = new File(ROOT+"/userID"+u.getUserId()+VIDEOS_URL,fileName);
-		if(!file.exists()) {
-			file.mkdirs();
-			file.createNewFile();
+		if (u == null) {
+			response.sendRedirect("login");
 		}
-		
-	    Path TO = Paths.get(file.getAbsolutePath());	    
-	    
-	    Files.copy(fileContent, TO,  StandardCopyOption.REPLACE_EXISTING);
-	    
-	    fileContent.close();
+		Part newVideo = request.getPart("newVideo");
+		String name = request.getParameter("name");
+		Resources.writeVideo(u, newVideo);
 		
 		String[] inputTags = request.getParameter("tags").split("\\s+");
 		Set<Tag> tags = new HashSet<>();
@@ -69,21 +56,20 @@ public class UploadVideoServlet extends HttpServlet {
 			tags.add(new Tag(string));
 		}
 		
-		Long privacy = Long.valueOf(request.getParameter("privacy"));
-		
-		Video v = null;
 		try {
-			v = new Video(name, TO.toString().replace('\\', '/'), privacy, u.getUserId(), tags);
+			Long privacy = Long.valueOf(request.getParameter("privacy"));
+			String fileName = Paths.get(newVideo.getSubmittedFileName()).getFileName().toString();
+			Video v = new Video(name, fileName , privacy, u.getUserId(), tags);
 			VideoDao.getInstance().createVideo(v);
 		} catch (VideoException e) {
-			e.printStackTrace();
+			request.getRequestDispatcher("upload.jsp").forward(request, response);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			request.getRequestDispatcher("upload.jsp").forward(request, response);
 		} catch (TagNotFoundException e) {
-			e.printStackTrace();
+			request.getRequestDispatcher("upload.jsp").forward(request, response);
 		}
 		
-		request.getRequestDispatcher("main.jsp").forward(request, response);
+		request.getRequestDispatcher("main").forward(request, response);
 	}
 
 }

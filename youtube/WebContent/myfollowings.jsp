@@ -13,7 +13,7 @@
 		<c:forEach items="${ requestScope.following }" var="user">
 		<div>
 			<a href="viewProfile?username=${user.username}">
-				<img src="img?path=${user.avatarUrl}" width="50px" height="auto"/>
+				<img src="img?path=${user.avatarUrl}&userId=${user.userId}" width="50px" height="auto"/>
 				<c:out value="${user.username}"></c:out>
 			</a>
 		</div>

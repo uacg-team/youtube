@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.sun.org.apache.xml.internal.security.algorithms.implementations.IntegrityHmac;
+
 import model.User;
 import model.Video;
 import model.VideoDao;
@@ -19,13 +21,23 @@ import model.exceptions.video.VideoNotFoundException;
 @WebServlet("/player")
 public class PlayerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-
+	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String videoURL = request.getParameter("url");
+	
 		try {
-			String videoURL = request.getParameter("url");
 			VideoDao.getInstance().increaseViews(videoURL);
+			System.out.println("PlayerServlet:videoURL:"+videoURL);
 			Video video = VideoDao.getInstance().getVideo(videoURL);
+			
+			int likes = VideoDao.getInstance().getLikes(video.getVideoId());
+			int disLikes = VideoDao.getInstance().getDisLikes(video.getVideoId());
+		
+			request.setAttribute("likes", likes);
+			request.setAttribute("disLikes", disLikes);
+		
 			Set<Video> related = VideoDao.getInstance().getRelatedVideos(video.getLocationUrl());
+		
 			request.setAttribute("mainVideo", video);
 			request.setAttribute("related", related);
 			CommentServlet.loadCommentsForVideo(request, video.getVideoId());
@@ -36,9 +48,9 @@ public class PlayerServlet extends HttpServlet {
 			}
 			request.getRequestDispatcher("player.jsp").forward(request, response);
 		} catch (VideoNotFoundException e) {
-			e.printStackTrace();
+			request.getRequestDispatcher("player.jsp").forward(request, response);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			request.getRequestDispatcher("player.jsp").forward(request, response);
 		}
 		
 	}

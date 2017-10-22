@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import model.User;
 import model.utils.Resources;
 
 
@@ -19,9 +18,9 @@ public class ImgServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		try {
 			String relativePath = request.getParameter("path");
-			User u = (User) request.getAttribute("user");
-			if (relativePath != null && u != null) {
-				Resources.readAvatar(relativePath, u, response);
+			Long id =  Long.valueOf(request.getParameter("userId"));
+			if (relativePath != null && id != null) {
+				Resources.readImage(relativePath, id, response);
 			}
 		} catch (IOException e) {
 			System.out.println(e.getMessage());

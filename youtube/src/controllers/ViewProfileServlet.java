@@ -46,8 +46,6 @@ public class ViewProfileServlet extends HttpServlet {
 			for (Video video : videos) {
 				video.setUserName(VideoDao.getInstance().getUserName(video.getUserId()));
 				video.setPrivacy(VideoDao.getInstance().getPrivacy(video.getPrivacyId()));
-				video.setLikes(VideoDao.getInstance().getLikes(video.getVideoId()));
-				video.setDisLikes(VideoDao.getInstance().getDisLikes(video.getVideoId()));
 			}
 			request.setAttribute("user", u);
 			request.setAttribute("followers", followers);

@@ -31,23 +31,11 @@ div.inline {
 				<c:out value="#${tag.tag} "></c:out>
 		</c:forEach>
 		<br>
-		<a href="player?url=${video.locationUrl}" id="preview">	
+		<a href="player?url=${video.locationUrl}">	
 			<video width="320" height="240" preload="none">
 		  		<source src="video?url=${video.locationUrl}&userId=${video.userId}" type="video/mp4">
 			</video>
 		</a><br>
-		
-		
-		<form action="videoLike?like=1&videoId=${video.videoId}&userId=${sessionScope.user.userId}" method="post">
-			<c:out value="${video.likes}"></c:out>
-			<input type="submit" value="Like">
-		</form>
-		
-		<form action="videoLike?like=-1&videoId=${video.videoId}&userId=${sessionScope.user.userId}" method="post">
-			<c:out value="${video.disLikes}"></c:out>
-			<input type="submit" value="Dislike">
-		</form>
-		
 	</div>
 	</c:forEach>
 </body>
