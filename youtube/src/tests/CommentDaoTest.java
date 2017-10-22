@@ -40,17 +40,19 @@ public class CommentDaoTest {
 	}
 	@Test
 	public void testLikeComment() throws SQLException, CommentException, UserException {
-		CommentDao.getInstance().createComment(new Comment("comment1", LocalDateTime.now(), 1, 1, 0));
-		CommentDao.getInstance().likeComment(1, 1);
-		Assert.assertEquals(CommentDao.getInstance().getLikes(1), 1);
+		Comment createdComment = new Comment("comment1", LocalDateTime.now(), 1, 1, 0);
+		CommentDao.getInstance().createComment(createdComment);
+		CommentDao.getInstance().likeComment(createdComment.getCommentId(), 1);
+		Assert.assertEquals(CommentDao.getInstance().getLikes(createdComment.getCommentId()), 1);
 	}
 	@Test
 	public void testDislikeComment() throws SQLException, CommentException, UserException {
-		CommentDao.getInstance().createComment(new Comment("comment1", LocalDateTime.now(), 1, 1, 0));
-		CommentDao.getInstance().dislikeComment(1, 1);
-		Assert.assertEquals(CommentDao.getInstance().getDislikes(1), 1);
-		CommentDao.getInstance().likeComment(1, 1);
-		Assert.assertEquals(CommentDao.getInstance().getLikes(1), 1);
+		Comment createdComment = new Comment("comment1", LocalDateTime.now(), 1, 1, 0);
+		CommentDao.getInstance().createComment(createdComment);
+		CommentDao.getInstance().dislikeComment(createdComment.getCommentId(), 1);
+		Assert.assertEquals(CommentDao.getInstance().getDislikes(createdComment.getCommentId()), 1);
+		CommentDao.getInstance().likeComment(createdComment.getCommentId(), 1);
+		Assert.assertEquals(CommentDao.getInstance().getLikes(createdComment.getCommentId()), 1);
 	}
 	@Before
 	public void init() throws SQLException {
@@ -70,6 +72,14 @@ public class CommentDaoTest {
 		try (PreparedStatement ps = con.prepareStatement(sql4)) {
 			ps.executeUpdate();
 		}
+	}
+	@Test
+	public void testDeleteComment() throws CommentException, SQLException {
+		Comment createdComment = new Comment("comment1", LocalDateTime.now(), 1, 1, 0);
+		Comment createdReply = new Comment("reply1", LocalDateTime.now(), 1, 1, createdComment.getCommentId());
+		CommentDao.getInstance().createComment(createdComment);
+		CommentDao.getInstance().createComment(createdReply);
+		CommentDao.getInstance().deleteComment(createdComment.getCommentId());
 	}
 
 }

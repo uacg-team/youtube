@@ -10,7 +10,12 @@
 <link type="text/css" rel="stylesheet" href="commentsCSS.css" />
 </head>
 <body>
+	<c:if test="${sessionScope.user!=null}">
 	<img src="img?path=${sessionScope.user.avatarUrl}" width="50px" height="auto"/>
+	</c:if>
+	<c:if test="${sessionScope.user==null}">
+	<img src="img?path=defaultAvatar.png" width="50px" height="auto"/>
+	</c:if>
 	<form action="comment?videoId=${requestScope.mainVideo.videoId}&url=${requestScope.mainVideo.locationUrl}" method="post">
 		New Comment<input type="text" placeholder="add comment" name="newComment"/>
 		<input type="submit" value="comment"/>
@@ -45,6 +50,13 @@
 						<input type="submit" value="dislike"/>
 						</form>
 					</div>
+					
+					<c:if test="${sessionScope.user.userId==comment.userId}">
+						<form action="comment?deleteCommentId=${comment.commentId}&url=${requestScope.mainVideo.locationUrl}" method="post">
+						<input type="submit" value="delete"/>
+						</form>
+					</c:if>
+					
 	</div>
 	
 	<form action="comment?videoId=${requestScope.mainVideo.videoId}&reply=${comment.commentId}&url=${requestScope.mainVideo.locationUrl}" method="post">
@@ -72,9 +84,7 @@
 				<form action="commentLike?videoId=${requestScope.mainVideo.videoId}&commentId=${reply.commentId}&like=-1&url=${requestScope.mainVideo.locationUrl}" method="post">
 				<input type="submit" value="dislike"/>
 				</form>
-  				
 				</div>
-				
 				<!-- test koito e samo za stranicata? -->
 					<form action="comment?videoId=${requestScope.mainVideo.videoId}&reply=${comment.commentId}&url=${requestScope.mainVideo.locationUrl}" method="post">
 						New reply<input type="text" placeholder="add comment" name="newComment"/>

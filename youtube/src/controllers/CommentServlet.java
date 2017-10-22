@@ -26,6 +26,11 @@ public class CommentServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		//triger for delete command:
+		if(request.getParameter("deleteCommentId")!=null) {
+			doDelete(request, response);
+			return;
+		}
 		// add new comment or reply
 		User u = ((User) request.getSession().getAttribute("user"));
 		if (u == null) {
@@ -45,11 +50,32 @@ public class CommentServlet extends HttpServlet {
 				CommentDao.getInstance().createComment(comment);
 			} catch (CommentException e) {
 				//TODO handle
+				e.printStackTrace();
 			} catch (SQLException e) {
 				//TODO handle
+				e.printStackTrace();
 			}
 			response.sendRedirect("player?url="+request.getParameter("url"));
 		}
+	}
+	@Override
+	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		try {
+			CommentDao.getInstance().deleteComment(Long.valueOf(req.getParameter("deleteCommentId")));
+		} catch (NumberFormatException e) {
+			req.setAttribute("error", "converting url");
+			req.getRequestDispatcher("player").forward(req, resp);
+			return;
+		} catch (CommentException e) {
+			req.setAttribute("error", "commentException "+e.getMessage());
+			req.getRequestDispatcher("player").forward(req, resp);
+			return;
+		} catch (SQLException e) {
+			req.setAttribute("error", "sqlException "+e.getMessage());
+			req.getRequestDispatcher("player").forward(req, resp);
+			return;
+		}
+		resp.sendRedirect("player?url="+req.getParameter("url"));
 	}
 
 	public static HttpServletRequest loadCommentsForVideo(HttpServletRequest request,long videoId) {

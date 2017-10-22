@@ -159,7 +159,7 @@ public class CommentDao {
 		//delete all likes for replies
 		String sql1 = "delete from comments_likes where comment_id in "
 				+ "(select * from (select r.comment_id from comments as c "
-				+ "inner join comments as r on (r.replay_id = c.comment_id) where c.comment_id=?) as d);";
+				+ "inner join comments as r on (r.reply_id = c.comment_id) where c.comment_id=?) as d);";
 		//delete all likes for comment
 		String sql2 = "delete from comments_likes where comment_id=?";
 		int count =0;
