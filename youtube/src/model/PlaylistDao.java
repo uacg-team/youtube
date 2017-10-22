@@ -247,9 +247,9 @@ public class PlaylistDao {
 
 	public List<Playlist> searchPlaylist(String searchPlaylistName) throws SQLException {
 		List<Playlist> playslist = new ArrayList<>();
-		String sql = "select * from playlists where playlist_name like '%?%'";
+		String sql = "select * from playlists where playlist_name like ?";
 		try (PreparedStatement ps = con.prepareStatement(sql)) {
-			ps.setString(1, searchPlaylistName.toLowerCase().trim());
+			ps.setString(1, "%"+searchPlaylistName.toLowerCase().trim()+"%");
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
 					Playlist p = new Playlist(rs.getLong("playlist_id"), rs.getString("playlist_name"),
