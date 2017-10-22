@@ -1,12 +1,6 @@
 package controllers;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -21,32 +15,21 @@ import model.User;
 import model.UserDao;
 import model.exceptions.user.UserException;
 import model.exceptions.user.UserNotFoundException;
+import model.utils.Resources;
 
 
 @WebServlet("/uploadAvatar")
 @MultipartConfig
 public class UploadAvatarSurvlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-   
-	public static final String AVATARS_URL = "C:/videos/";
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		User u = (User) request.getSession().getAttribute("user");
-		Part avatar = request.getPart("avatar");
-		String fileName = Paths.get(avatar.getSubmittedFileName()).getFileName().toString();
-		
-		InputStream fileContent = avatar.getInputStream();	
-		File file = new File(AVATARS_URL,fileName);
-		if(!file.exists()) {
-			file.createNewFile();
-		}
-	    Path TO = Paths.get(AVATARS_URL+fileName);	    
-	    Files.copy(fileContent, TO,  StandardCopyOption.REPLACE_EXISTING);
-	    fileContent.close();
-	    
-	    u.setAvatarUrl(fileName);
-	    try {
-			UserDao.getInstance().updateUser(u);
+		try {
+			User u = (User) request.getSession().getAttribute("user");
+			Part avatar = request.getPart("avatar");
+			if (u != null && avatar != null) {
+				Resources.writeAvatar(u, avatar);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (UserException e) {
@@ -54,8 +37,7 @@ public class UploadAvatarSurvlet extends HttpServlet {
 		} catch (UserNotFoundException e) {
 			e.printStackTrace();
 		}
-	    response.sendRedirect("updateUser");
-//	    resquest.getRequestDispatcher("updateUser.jsp").forward(request, response);
+		response.sendRedirect("updateUser");
 	}
 
 }

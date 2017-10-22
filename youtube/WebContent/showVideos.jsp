@@ -42,10 +42,12 @@ div.inline {
 			<c:out value="${video.likes}"></c:out>
 			<input type="submit" value="Like">
 		</form>
+		
 		<form action="videoLike?like=-1&videoId=${video.videoId}&userId=${sessionScope.user.userId}" method="post">
 			<c:out value="${video.disLikes}"></c:out>
 			<input type="submit" value="Dislike">
 		</form>
+		
 	</div>
 	</c:forEach>
 </body>

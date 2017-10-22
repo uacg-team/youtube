@@ -45,8 +45,9 @@ public class UploadVideoServlet extends HttpServlet {
 		// check if user is logged
 		
 		User u = (User) request.getSession().getAttribute("user");
-
 		Part newVideo = request.getPart("newVideo");
+		
+		
 		String name = request.getParameter("name");
 		String fileName = Paths.get(newVideo.getSubmittedFileName()).getFileName().toString(); // MSIE fix.
 		InputStream fileContent = newVideo.getInputStream();	
