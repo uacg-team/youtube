@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import model.User;
 import model.Video;
 import model.VideoDao;
 import model.exceptions.video.VideoNotFoundException;
@@ -28,6 +29,11 @@ public class PlayerServlet extends HttpServlet {
 			request.setAttribute("mainVideo", video);
 			request.setAttribute("related", related);
 			CommentServlet.loadCommentsForVideo(request, video.getVideoId());
+			if(request.getSession().getAttribute("user")!=null) {
+				User user = (User)request.getSession().getAttribute("user");
+				long userId = user.getUserId();
+				PlaylistServlet.loadPlaylistForUser(request, userId);
+			}
 			request.getRequestDispatcher("player.jsp").forward(request, response);
 		} catch (VideoNotFoundException e) {
 			e.printStackTrace();

@@ -11,6 +11,7 @@
 </head>
 <body>
 	<c:if test="${sessionScope.user!=null}">
+	<b><c:out value="${sessionScope.user.username}"></c:out></b>
 	<img src="img?path=${sessionScope.user.avatarUrl}" width="50px" height="auto"/>
 	</c:if>
 	<c:if test="${sessionScope.user==null}">
@@ -24,8 +25,7 @@
 	<br>
 	<br>
 	
-	
-	<c:out value="Comments: ${requestScope.countComments}"></c:out>
+	<b><c:out value="Comments: ${requestScope.countComments}"></c:out></b>
 	<br>
 	<br>
 	<br>

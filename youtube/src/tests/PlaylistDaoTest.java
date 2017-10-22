@@ -3,6 +3,7 @@ package tests;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,9 +11,12 @@ import org.junit.Test;
 
 import model.Playlist;
 import model.PlaylistDao;
+import model.User;
+import model.UserDao;
 import model.exceptions.playlists.PlaylistException;
 import model.exceptions.user.UserException;
 import model.utils.DBConnection;
+import model.utils.Hash;
 
 public class PlaylistDaoTest {
 	private static final Connection con = DBConnection.CON1.getConnection();
@@ -68,6 +72,18 @@ public class PlaylistDaoTest {
 		}
 		//for test delete
 		PlaylistDao.getInstance().createPlaylist(new Playlist("list", 1));
+	}
+	@Test
+	public void testGetPlaylistsForUser() throws PlaylistException, SQLException, UserException {
+		User u = new User("vel","123qweQWE!@#","asda@da.vg");
+		UserDao.getInstance().createUser(u);
+		Playlist p = new Playlist("videos", u.getUserId());
+		PlaylistDao.getInstance().createPlaylist(p);
+		List<Playlist> list=PlaylistDao.getInstance().getPlaylistForUser(u.getUserId());
+		Playlist get = list.get(0);
+		Assert.assertTrue(p.getPlaylistName().equals(get.getPlaylistName()));
+		Assert.assertTrue(p.getPlaylistId() == (get.getPlaylistId()));
+		Assert.assertTrue(p.getUserId() == get.getUserId());
 	}
 
 }

@@ -53,6 +53,7 @@ public class ViewProfileServlet extends HttpServlet {
 			request.setAttribute("followers", followers);
 			request.setAttribute("following", following);
 			request.setAttribute("videos", videos);
+			PlaylistServlet.loadPlaylistForUser(request, loggedUser.getUserId());
 		} catch (SQLException e) {
 			request.setAttribute("error", "SQL: " + e.getMessage());
 		} catch (UserNotFoundException e) {

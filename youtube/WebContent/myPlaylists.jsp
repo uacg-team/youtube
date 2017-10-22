@@ -8,16 +8,12 @@
 <title>Insert title here</title>
 </head>
 <body>
+<b>add to playlist</b>
+<select name="addToPlaylist" onchange="location = this.value;">
 	<c:forEach items="${requestScope.myPlaylists}" var="playlist">
-		<p><b>${playlist.playlistName}</b>
-			<a href="playlist?v=loadVideos&playlistName=${playlist.playlistName}">
-			<button>view</button>
-			</a>
+		 <option value="with ajax send post to playlist?playlistName=${playlist.playlistName}">${playlist.playlistName}</option>
 	</c:forEach>
-	
-	<form action="playlist?m=createPlaylist" method="post">
-	New playlist<input type="text" placeholder="add name" name="newPlaylist"/>
-	<input type="submit" value="create"/>
-	</form>
+</select>
+		
 </body>
 </html>

@@ -37,5 +37,9 @@ div.inline {
 	<h3>Videos</h3>
 		<jsp:include page="showVideos.jsp"></jsp:include><br>
 	</div>
+	<div class="inline">
+	<h3>Playlists</h3>
+		<jsp:include page="playlist.jsp"></jsp:include>
+	</div>
 </body>
 </html>

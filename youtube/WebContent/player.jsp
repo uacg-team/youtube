@@ -38,6 +38,8 @@ div.inline {
 
 	</video>
 	<br>
+	<jsp:include page="myPlaylists.jsp"></jsp:include>
+	<br>
 	<jsp:include page="comments.jsp"></jsp:include>
 	</div>
 	
