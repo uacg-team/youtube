@@ -1,13 +1,14 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <%@ taglib prefix = "c" uri = "http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>	
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>main</title>
 </head>
 <body>
+
 	<jsp:include page="header.jsp"></jsp:include><br>
 	
 	<form action="main" method = "get">
@@ -17,6 +18,7 @@
 		</select>
 		<input type="submit" value="Sort">
 	</form>
+	
 	<div>
 		<jsp:include page="showVideos.jsp"></jsp:include><br>
 	</div>

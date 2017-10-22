@@ -22,15 +22,11 @@ public class LoginServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Enumeration<String> names=request.getAttributeNames();
-		while(names.hasMoreElements()) {
-			System.out.println(names.nextElement());
+		if (request.getSession().getAttribute("user") != null) {
+			response.sendRedirect("main");
+		}else {
+			request.getRequestDispatcher("login.jsp").forward(request, response);
 		}
-		Enumeration<String> p=request.getParameterNames();
-		while(p.hasMoreElements()) {
-			System.out.println(p.nextElement());
-		}
-		request.getRequestDispatcher("login.jsp").forward(request, response);
 	}
 	
 	@Override
