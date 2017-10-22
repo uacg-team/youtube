@@ -2,6 +2,7 @@ package controllers;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,6 +22,14 @@ public class LoginServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		Enumeration<String> names=request.getAttributeNames();
+		while(names.hasMoreElements()) {
+			System.out.println(names.nextElement());
+		}
+		Enumeration<String> p=request.getParameterNames();
+		while(p.hasMoreElements()) {
+			System.out.println(p.nextElement());
+		}
 		request.getRequestDispatcher("login.jsp").forward(request, response);
 	}
 	

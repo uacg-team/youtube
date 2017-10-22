@@ -1,10 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="ISO-8859-1"%>
+    pageEncoding="UTF-8"%>
 <%@ taglib prefix = "c" uri = "http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>header</title>
 </head>
 <body>
@@ -13,7 +13,7 @@
    		<img src="logo.png" alt="Avatar" style="width: 200px; height: auto">
 	</a>
 	
-	<c:if test="${ sessionScope.user == null}"> 
+	<c:if test="${sessionScope.user == null}"> 
 		<form action="login" method="get">
 			<input type="submit" value="Login">
 		</form>
