@@ -28,13 +28,14 @@
 	</form>
 	
 	<c:if test="${ sessionScope.user != null}"> 
-		<form action="profile" method="get">
-			<img src="image" width="50px" height="auto"/>
-				<c:out value="Welcome, ${user.username }"></c:out>
-			<br>
+		<img src="image" width="50px" height="auto"/>
+		<c:out value="Welcome, ${user.username}"></c:out>
+		<form action="viewProfile?username=${user.username}">
 			<input type="submit" value="My profile">
 		</form>
 		
+		<c:out value="viewProfile?username=${user.username}"></c:out>
+
 		<form action="updateUser" method="get">
 			<input type="submit" value="Update user">
 		</form>

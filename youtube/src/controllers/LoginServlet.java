@@ -34,12 +34,8 @@ public class LoginServlet extends HttpServlet {
 			if (password.equals(u.getPassword())) {
 				request.getSession().setMaxInactiveInterval(-1);
 				request.getSession().setAttribute("user", u);
-				System.out.println("otivam v main");
-				//TODO
 				response.sendRedirect("main");
 			} else {
-				//TODO
-				System.out.println("greshna parola");
 				request.setAttribute("passwordError", "Wrong Password");
 				request.getRequestDispatcher("login.jsp").forward(request, response);
 			}

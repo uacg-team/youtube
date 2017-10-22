@@ -11,8 +11,14 @@
 	<div>
 		<h1>following</h1>
 		<c:forEach items="${ requestScope.following }" var="user">
-			<p><c:out value="${user.username}"></c:out></p>
+		<div>
+			<a href="viewProfile?username=${user.username}">
+				<img src="img?path=${user.avatarUrl}" width="50px" height="auto"/>
+				<p><c:out value="${user.username}"></c:out></p>
+			</a>
+		</div>
 		</c:forEach>
 	</div>
+	<br>
 </body>
 </html>

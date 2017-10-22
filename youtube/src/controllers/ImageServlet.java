@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.mysql.jdbc.Field;
-
 import model.User;
 import model.utils.Resources;
 
@@ -33,8 +31,6 @@ public class ImageServlet extends HttpServlet {
 			url = Resources.ROOT + File.separator + u.getUserId() + File.separator + url;
 		}
 
-		System.out.println(url);
-		
 		try (OutputStream out = response.getOutputStream()){
 			Path path = Paths.get(url);
 			Files.copy(path, out);

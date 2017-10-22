@@ -5,20 +5,26 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>my profile</title>
+<title>view profile</title>
 </head>
 <body>
-
 	<jsp:include page="header.jsp"></jsp:include><br>
+	
+	<div>
+	user:
+		<a href="viewProfile?username=${user.username}">
+			<img src="img?path=${user.avatarUrl}" width="50px" height="auto"/>
+			<c:out value="${user.username}"></c:out>
+		</a>
+	</div>
+	
+	<h1><c:out value="${user.username}"></c:out></h1>	
 
-	<jsp:include page="error.jsp"></jsp:include><br>
-		
 	<jsp:include page="myfollowers.jsp"></jsp:include>
 	
 	<jsp:include page="myfollowings.jsp"></jsp:include><br>
 	
-	<h3>MyVideos</h3>
+	<h3>Videos</h3>
 	<jsp:include page="showVideos.jsp"></jsp:include><br>
-	
 </body>
 </html>
