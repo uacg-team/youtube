@@ -53,7 +53,7 @@ public class UserDao {
 	}
 
 	public List<User> searchUser(String username) throws SQLException, UserException {
-		String sql = "SELECT * FROM users WHERE LOWER(username) LIKE LOWER(?)";
+		String sql = "SELECT * FROM users WHERE username LIKE ?";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
 			ps.setString(1, "%" + username + "%");
 			ResultSet rs = ps.executeQuery();
