@@ -1,4 +1,4 @@
-package controllers;
+package controllers.videos;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.sun.org.apache.xml.internal.security.algorithms.implementations.IntegrityHmac;
 
+import controllers.comments.CommentServlet;
+import controllers.playlists.PlaylistServlet;
 import model.User;
 import model.Video;
 import model.VideoDao;

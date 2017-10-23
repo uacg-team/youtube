@@ -1,4 +1,4 @@
-package controllers;
+package controllers.comments;
 
 import java.io.IOException;
 import java.sql.SQLException;

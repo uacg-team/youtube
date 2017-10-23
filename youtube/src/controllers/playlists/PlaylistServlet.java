@@ -1,4 +1,4 @@
-package controllers;
+package controllers.playlists;
 
 import java.io.IOException;
 import java.sql.SQLException;

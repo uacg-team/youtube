@@ -1,4 +1,4 @@
-package controllers;
+package controllers.users;
 
 import java.io.IOException;
 import java.nio.file.Paths;
