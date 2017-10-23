@@ -32,6 +32,13 @@ div.inline {
 			<c:out value="#${currentTag.tag} "></c:out>
 		</c:forEach>
 		</h3>
+		
+		<h3>Owner: 
+			<a href="viewProfile?username=${requestScope.videoOwner.username}">
+				<c:out value="${requestScope.videoOwner.username }"></c:out>
+				<img src="img?path=${requestScope.videoOwner.avatarUrl }&userId=${requestScope.videoOwner.userId }" width="50px" height="auto"/>
+			</a>
+		</h3>
 		<br>
 		
 		<c:if test="${sessionScope.user.userId == requestScope.mainVideo.userId }">

@@ -255,6 +255,7 @@ public class VideoDao {
 			ps.setString(1, location_url);
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
+				//TODO pri ednakvi imena na videoto (location_url) she ni vyrne posednoto namereno
 				video = new Video(
 						rs.getLong("video_id"), 
 						rs.getString("name"), 

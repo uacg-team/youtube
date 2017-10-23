@@ -106,12 +106,33 @@ public class UserDao {
 		}
 	}
 	
-
-
 	public User getUser(String username) throws SQLException, UserNotFoundException, UserException {
 		String sql = "SELECT * FROM users WHERE username = ?;";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
 			ps.setString(1, username);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				return new User(
+						rs.getLong("user_id"), 
+						rs.getString("username"), 
+						rs.getString("password"),
+						rs.getString("facebook"), 
+						rs.getString("email"),
+						DateTimeConvertor.sqlToLdt(rs.getString("date_creation")), 
+						rs.getString("first_name"),
+						rs.getString("last_name"),
+						rs.getString("avatar_url"),
+						rs.getString("gender"));
+			} else {
+				throw new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND);
+			}
+		}
+	}
+	
+	public User getUser(Long userId) throws SQLException, UserNotFoundException, UserException {
+		String sql = "SELECT * FROM users WHERE user_id = ?;";
+		try (PreparedStatement ps = con.prepareStatement(sql);) {
+			ps.setLong(1, userId);
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
 				return new User(
@@ -144,6 +165,8 @@ public class UserDao {
 	}
 
 	public void followUser(long user_id, long follower_id) throws SQLException {
+		System.out.println("user_id " + user_id);
+		System.out.println("follower_id " + follower_id);
 		String follow = "INSERT INTO users_follow_users (user_id,follower_id) VALUES(?,?);";
 		try (PreparedStatement ps = con.prepareStatement(follow);) {
 			ps.setLong(1, user_id);
@@ -153,6 +176,8 @@ public class UserDao {
 	}
 
 	public void unfollowUser(long user_id, long following_id) throws SQLException {
+		System.out.println("user_id " + user_id);
+		System.out.println("following_id " + following_id);
 		String unfollow = "DELETE FROM users_follow_users WHERE user_id = ? AND follower_id = ?;";
 		try (PreparedStatement ps = con.prepareStatement(unfollow);) {
 			ps.setLong(1, user_id);
