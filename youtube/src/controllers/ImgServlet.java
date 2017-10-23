@@ -20,7 +20,7 @@ public class ImgServlet extends HttpServlet {
 			String relativePath = request.getParameter("path");
 			Long id =  Long.valueOf(request.getParameter("userId"));
 			if (relativePath != null && id != null) {
-				Resources.readImage(relativePath, id, response);
+				Resources.readAvatar(relativePath, id, response);
 			}
 		} catch (IOException e) {
 			System.out.println(e.getMessage());

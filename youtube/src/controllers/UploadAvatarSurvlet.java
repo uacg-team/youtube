@@ -29,7 +29,7 @@ public class UploadAvatarSurvlet extends HttpServlet {
 			User u = (User) request.getSession().getAttribute("user");
 			Part avatar = request.getPart("avatar");
 			if (u != null && avatar != null) {
-				Resources.writeImage(u, avatar);
+				Resources.writeAvatar(u, avatar);
 				String fileName = Paths.get(avatar.getSubmittedFileName()).getFileName().toString();
 				u.setAvatarUrl(fileName);
 				UserDao.getInstance().updateUser(u);

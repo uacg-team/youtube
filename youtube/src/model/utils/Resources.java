@@ -29,7 +29,6 @@ public abstract class Resources {
 	 * @param response
 	 * @throws IOException
 	 */
-	@Deprecated
 	public static void readFromFile(String absolutePath, HttpServletResponse response) throws IOException {
 		File myFile = new File(absolutePath);
 		try (OutputStream out = response.getOutputStream()) {
@@ -46,7 +45,6 @@ public abstract class Resources {
 	 *            -
 	 * @throws IOException
 	 */
-	@Deprecated
 	public static void writeFile(String absolutePath, InputStream inStream) throws IOException {
 		File myFile = new File(absolutePath);
 		if (!myFile.exists()) {
@@ -56,7 +54,7 @@ public abstract class Resources {
 		Files.copy(inStream, myFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
 	}
 
-	public static void writeImage(User u, Part image) throws IOException, SQLException, UserException, UserNotFoundException {
+	public static void writeAvatar(User u, Part image) throws IOException, SQLException, UserException, UserNotFoundException {
 		String fileName = Paths.get(image.getSubmittedFileName()).getFileName().toString();
 		String absolutePath = Resources.ROOT + File.separator + u.getUserId()+ File.separator + Resources.IMAGE_URL+ File.separator + fileName;
 		System.out.println("Resources:writeImage:absolutePath:"+absolutePath);
@@ -90,7 +88,7 @@ public abstract class Resources {
 		}
 	}
 	
-	public static void readImage(String filename, Long userId, HttpServletResponse response) throws IOException {
+	public static void readAvatar(String filename, Long userId, HttpServletResponse response) throws IOException {
 		String absolutePath = Resources.ROOT + File.separator + userId + File.separator + Resources.IMAGE_URL
 				+ File.separator + filename;
 		System.out.println("Resources:readImage:absolutePath:"+absolutePath);
