@@ -42,7 +42,6 @@ public abstract class Resources {
 	 * @param absolutePath:
 	 *            C:\\Users\\YouTube-PNG-Photos.png
 	 * @param inStream
-	 *            -
 	 * @throws IOException
 	 */
 	public static void writeFile(String absolutePath, InputStream inStream) throws IOException {
