@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import model.User;
 import model.utils.Resources;
 
-
+@Deprecated
 @WebServlet("/image")
 public class ImageServlet extends HttpServlet {
 

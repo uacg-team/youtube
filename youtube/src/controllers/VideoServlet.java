@@ -1,11 +1,6 @@
 package controllers;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,15 +16,8 @@ public class VideoServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String url = request.getParameter("url");
-		String userId = request.getParameter("userId");
-
-		url = Resources.ROOT + File.separator + userId + File.separator + "videos" + File.separator + url;
-
-		try (OutputStream out = response.getOutputStream()){
-			Path path = Paths.get(url);
-			Files.copy(path, out);
-			out.flush();
-		}
+		Long userId = Long.valueOf(request.getParameter("userId"));
+		Resources.readVideo(url,userId,response );
 	}
 
 }

@@ -1,6 +1,7 @@
 package controllers;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -28,7 +29,10 @@ public class UploadAvatarSurvlet extends HttpServlet {
 			User u = (User) request.getSession().getAttribute("user");
 			Part avatar = request.getPart("avatar");
 			if (u != null && avatar != null) {
-				Resources.writeAvatar(u, avatar);
+				Resources.writeImage(u, avatar);
+				String fileName = Paths.get(avatar.getSubmittedFileName()).getFileName().toString();
+				u.setAvatarUrl(fileName);
+				UserDao.getInstance().updateUser(u);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

@@ -23,7 +23,7 @@ div.inline {
 	<div class="inline">
 		<h1>User</h1>
 		<a href="viewProfile?username=${user.username}">
-			<img src="img?path=${user.avatarUrl}" width="50px" height="auto"/>
+			<img src="img?path=${user.avatarUrl}&userId=${user.userId}" width="50px" height="auto"/>
 			<c:out value="${user.username}"></c:out>
 		</a>
 	</div>

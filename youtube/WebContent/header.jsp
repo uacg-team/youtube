@@ -60,7 +60,7 @@ li a:hover {
 	<c:if test="${ sessionScope.user != null}"> 
 	<li>
 		<a href="viewProfile?username=${sessionScope.user.username}">
-			<img src="image" width="50px" height="auto"/>
+			<img src="img?path=${sessionScope.user.avatarUrl}&userId=${sessionScope.user.userId}" width="50px" height="auto"/>
 			<c:out value="${sessionScope.user.username}"></c:out>
 		</a>
 	</li>

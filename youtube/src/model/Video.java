@@ -27,8 +27,6 @@ public class Video implements Serializable {
 
 	private String userName;
 	private String privacy;
-	private int likes;
-	private int disLikes;
 	
 	private Set<Tag> tags = new HashSet<>();
 	
@@ -81,13 +79,7 @@ public class Video implements Serializable {
 	public String getDescription() {
 		return this.description;
 	}
-	public int getDisLikes() {
-		return disLikes;
-	}
-	
-	public int getLikes() {
-		return likes;
-	}
+
 
 	public String getLocationUrl() {
 		return locationUrl;
@@ -150,14 +142,6 @@ public class Video implements Serializable {
 			throw new VideoException(VideoException.INVALID_DESCRIPTION);
 		}
 		this.description = description;
-	}
-
-	public void setDisLikes(int disLikes) {
-		this.disLikes = disLikes;
-	}
-
-	public void setLikes(int likes) {
-		this.likes = likes;
 	}
 
 	public void setLocationUrl(String locationUrl) throws VideoException {

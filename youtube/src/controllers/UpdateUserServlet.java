@@ -31,8 +31,6 @@ public class UpdateUserServlet extends HttpServlet {
 		String firstName = request.getParameter("firstName").equals("") ? null : request.getParameter("firstName");
 		String lastName = request.getParameter("lastName").equals("")  ? null : request.getParameter("lastName");
 		String facebook = request.getParameter("facebook").equals("")  ? null : request.getParameter("facebook");
-		String avatarUrl = request.getParameter("avatarUrl").equals("")  ? u.getAvatarUrl()
-				: request.getParameter("avatarUrl");
 		String gender = request.getParameter("gender") == "null" ? null : request.getParameter("gender");
 
 		try {
@@ -44,9 +42,6 @@ public class UpdateUserServlet extends HttpServlet {
 			}
 			if (facebook != null) {
 				u.setFacebook(facebook);
-			}
-			if (avatarUrl != null) {
-				u.setAvatarUrl(avatarUrl);
 			}
 
 			u.setGender(gender);

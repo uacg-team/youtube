@@ -15,34 +15,35 @@ import model.VideoDao;
 @WebServlet("/videoLike")
 public class VideoLikeServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		User u = ((User)request.getSession().getAttribute("user"));
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		User u = ((User) request.getSession().getAttribute("user"));
 		if (u == null) {
 			response.sendRedirect("login");
 			return;
 		}
-		
 		int like = Integer.valueOf(request.getParameter("like"));
-		int videoId = Integer.valueOf(request.getParameter("videoId"));
+		Long videoId = Long.valueOf(request.getParameter("videoId"));
+
 		long userId = u.getUserId();
-		if (like == 1) {
-			try {
+		String url = request.getParameter("url");
+		try {
+			if (like == 1) {
+				// System.out.println("LikeVideo:"+videoId);
 				VideoDao.getInstance().like(videoId, userId);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-		} else if (like == -1) {
-			try {
+			if (like == -1) {
+				// System.out.println("disLikeVideo:"+videoId);
 				VideoDao.getInstance().disLike(videoId, userId);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
+		} catch (SQLException e) {
+			request.getRequestDispatcher("player.jsp").forward(request, response);
+			e.printStackTrace();
 		}
-		response.sendRedirect("main");
+		response.sendRedirect("player?url="+url);
+		// request.getRequestDispatcher("player.jsp").forward(request, response);
+		// response.sendRedirect("player.jsp");
 	}
 
 }
