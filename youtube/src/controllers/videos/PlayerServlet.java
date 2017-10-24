@@ -2,7 +2,6 @@ package controllers.videos;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -10,8 +9,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.sun.org.apache.xml.internal.security.algorithms.implementations.IntegrityHmac;
 
 import controllers.comments.CommentServlet;
 import controllers.playlists.PlaylistServlet;
@@ -28,23 +25,22 @@ public class PlayerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String videoURL = request.getParameter("url");
-	
+		long videoId = Long.parseLong(request.getParameter("videoId"));
+		
 		try {
-			VideoDao.getInstance().increaseViews(videoURL);
-			System.out.println("PlayerServlet:videoURL:"+videoURL);
-			Video video = VideoDao.getInstance().getVideo(videoURL);
+			VideoDao.getInstance().increaseViews(videoId);
+			Video video = VideoDao.getInstance().getVideo(videoId);
 			request.setAttribute("mainVideo", video);
 			User videoOwner =  UserDao.getInstance().getUser(video.getUserId());
 			request.setAttribute("videoOwner", videoOwner);
 			
-			int likes = VideoDao.getInstance().getLikes(video.getVideoId());
+			int likes = VideoDao.getInstance().getLikes(videoId);
 			request.setAttribute("likes", likes);
 		
-			int disLikes = VideoDao.getInstance().getDisLikes(video.getVideoId());
+			int disLikes = VideoDao.getInstance().getDisLikes(videoId);
 			request.setAttribute("disLikes", disLikes);
 		
-			Set<Video> related = VideoDao.getInstance().getRelatedVideos(video.getLocationUrl());
+			Set<Video> related = VideoDao.getInstance().getRelatedVideos(videoId);
 			request.setAttribute("related", related);
 		
 			CommentServlet.loadCommentsForVideo(request, video.getVideoId());
@@ -59,10 +55,9 @@ public class PlayerServlet extends HttpServlet {
 		} catch (SQLException e) {
 			request.getRequestDispatcher("player.jsp").forward(request, response);
 		} catch (UserNotFoundException e) {
-			e.printStackTrace();
+			request.getRequestDispatcher("player.jsp").forward(request, response);
 		} catch (UserException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			request.getRequestDispatcher("player.jsp").forward(request, response);
 		}
 		
 	}

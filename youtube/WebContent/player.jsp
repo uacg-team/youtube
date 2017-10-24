@@ -42,7 +42,7 @@ div.inline {
 		<br>
 		
 		<c:if test="${sessionScope.user.userId == requestScope.mainVideo.userId }">
-			<a href="#"><button>edit video</button></a>
+			<a href="editVideo?videoId=${requestScope.mainVideo.userId}"><button>edit video</button></a>
 		</c:if>
 		<br>
 		
@@ -76,7 +76,7 @@ div.inline {
 	<c:forEach items="${requestScope.related}" var="relVideo">	
 	<div class="inline">
 		Name: <c:out value="${relVideo.name }"></c:out><br>
-		<a href="player?url=${relVideo.locationUrl}">	
+		<a href="player?videoId=${relVideo.videoId}">	
 			<video width="320" height="240">
 		  		<source src="video?url=${relVideo.locationUrl}&userId=${relVideo.userId}" type="video/mp4">
 			</video>
@@ -86,10 +86,5 @@ div.inline {
 		</c:forEach>
 	</div>
 	</c:forEach>
-		
-
- 
-	
-			
 </body>
 </html>

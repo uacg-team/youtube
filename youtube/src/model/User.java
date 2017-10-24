@@ -1,6 +1,5 @@
 package model;
 
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +8,6 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import model.exceptions.user.UserException;
-import model.exceptions.user.UserNotFoundException;
 import model.utils.Hash;
 
 public class User {
@@ -83,11 +81,11 @@ public class User {
 		return firstName;
 	}
 
-	public List<User> getFollowers() throws SQLException, UserNotFoundException, UserException {
+	public List<User> getFollowers(){
 		return this.followers;
 	}
 
-	public List<User> getFollowing() throws SQLException, UserNotFoundException, UserException {
+	public List<User> getFollowing(){
 		return this.following;
 	}
 

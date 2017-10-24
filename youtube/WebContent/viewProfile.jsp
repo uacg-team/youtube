@@ -27,33 +27,42 @@ div.inline {
 			<c:out value="${user.username}"></c:out>
 		</a>
 		
-		<!-- follow/unfollow logic  -->
-		<c:if test="${sessionScope.user.userId != user.userId}">
-			<c:set var="contains" value="false" />
-			<c:forEach var="follower" items="${requestScope.followers}">
-			  <c:if test="${follower.userId eq sessionScope.user.userId}">
-			    <c:set var="contains" value="true" />
-			  </c:if>
-			</c:forEach>
-			
-			<c:if test="${contains eq true}">
-				<form action="follow" method ="post">
-					<input type="hidden" value="${user.userId}" name="following">
-					<input type="hidden" value="${sessionScope.user.userId}" name="follower">
-					<input type="hidden" value="unfollow" name="action">
-					<input type="submit" value="unfollow">
-				</form>
-			</c:if>
-			
-			<c:if test="${contains eq false}">
-				<form action="follow" method ="post">
-					<input type="hidden" value="${user.userId}" name="following">
-					<input type="hidden" value="${sessionScope.user.userId}" name="follower">
-					<input type="hidden" value="follow" name="action">
-					<input type="submit" value="follow">
+		<!-- Delete user -->
+		<c:if test="${ not empty sessionScope.user  }">
+			<c:if test="${sessionScope.user.userId == user.userId}">
+				<form action="deleteUser" method="post">
+					<input type="submit" value="delete account">
 				</form>
 			</c:if>
 		</c:if>
+		
+			<!-- follow/unfollow logic  -->
+			<c:if test="${sessionScope.user.userId != user.userId}">
+				<c:set var="contains" value="false" />
+				<c:forEach var="follower" items="${requestScope.followers}">
+				  <c:if test="${follower.userId eq sessionScope.user.userId}">
+				    <c:set var="contains" value="true" />
+				  </c:if>
+				</c:forEach>
+				
+				<c:if test="${contains eq true}">
+					<form action="follow" method="post">
+						<input type="hidden" value="${user.userId}" name="following">
+						<input type="hidden" value="${sessionScope.user.userId}" name="follower">
+						<input type="hidden" value="unfollow" name="action">
+						<input type="submit" value="unfollow">
+					</form>
+				</c:if>
+				
+				<c:if test="${contains eq false}">
+					<form action="follow" method="post">
+						<input type="hidden" value="${user.userId}" name="following">
+						<input type="hidden" value="${sessionScope.user.userId}" name="follower">
+						<input type="hidden" value="follow" name="action">
+						<input type="submit" value="follow">
+					</form>
+				</c:if>
+			</c:if>
 	</div>
 	
 	

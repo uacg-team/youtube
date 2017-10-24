@@ -16,7 +16,7 @@ public class VideoServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String url = request.getParameter("url");
-		Long userId = Long.valueOf(request.getParameter("userId"));
+		long userId = Long.valueOf(request.getParameter("userId"));
 		Resources.readVideo(url,userId,response );
 	}
 

@@ -27,15 +27,18 @@ public class FollowServlet extends HttpServlet {
 			return;
 		}
 
-		Long followingId = Long.valueOf(request.getParameter("following"));
-		Long followerId = Long.valueOf(request.getParameter("follower"));
+		long followingId = Long.valueOf(request.getParameter("following"));
+		long followerId = Long.valueOf(request.getParameter("follower"));
 
 		String action = request.getParameter("action");
-
+		
+		System.out.println("action = " + action);
+		
 		User user = null;
 		try {
 			if (action.equals("follow")) {
 				UserDao.getInstance().followUser(followingId, followerId);
+
 			}
 			if (action.equals("unfollow")) {
 				UserDao.getInstance().unfollowUser(followingId, followerId);
@@ -48,8 +51,8 @@ public class FollowServlet extends HttpServlet {
 		} catch (UserException e) {
 			e.printStackTrace();
 		}
-		System.out.println(user.getUsername());
-		response.sendRedirect("viewProfile?username=" + user.getUsername());
+//		request.getRequestDispatcher("viewProfile?username=" + user.getUsername()).forward(request, response);
+		 response.sendRedirect("viewProfile?username=" + user.getUsername());
 	}
 
 }

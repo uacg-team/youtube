@@ -44,9 +44,10 @@ public class UserDao {
 			ps.setString(4, DateTimeConvertor.ldtToSql(u.getDateCreation()));
 			ps.setString(5, u.getAvatarUrl());
 			ps.executeUpdate();
-			ResultSet rs = ps.getGeneratedKeys();
-			rs.next();
-			u.setUserId(rs.getLong(1));
+			try (ResultSet rs = ps.getGeneratedKeys();) {
+				rs.next();
+				u.setUserId(rs.getLong(1));
+			}
 		}
 	}
 
@@ -54,23 +55,24 @@ public class UserDao {
 		String sql = "SELECT * FROM users WHERE username LIKE ?";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
 			ps.setString(1, "%" + username + "%");
-			ResultSet rs = ps.executeQuery();
-			List<User> users = new ArrayList<>();
-			while (rs.next()) {
-				users.add(
-						new User(
-								rs.getLong("user_id"), 
-								rs.getString("username"), 
-								rs.getString("password"),
-								rs.getString("facebook"), 
-								rs.getString("email"),
-								DateTimeConvertor.sqlToLdt(rs.getString("date_creation")), 
-								rs.getString("first_name"),
-								rs.getString("last_name"),
-								rs.getString("avatar_url"),
-								rs.getString("gender")));
+			try (ResultSet rs = ps.executeQuery();) {
+				List<User> users = new ArrayList<>();
+				while (rs.next()) {
+					users.add(
+							new User(
+									rs.getLong("user_id"), 
+									rs.getString("username"), 
+									rs.getString("password"),
+									rs.getString("facebook"), 
+									rs.getString("email"),
+									DateTimeConvertor.sqlToLdt(rs.getString("date_creation")), 
+									rs.getString("first_name"),
+									rs.getString("last_name"),
+									rs.getString("avatar_url"),
+									rs.getString("gender")));
+				}
+				return users;
 			}
-			return users;
 		}
 	}
 
@@ -96,13 +98,12 @@ public class UserDao {
 		String sql = "SELECT * FROM users WHERE username = ?;";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
 			ps.setString(1, username);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				//ResultSet is not empty
-				return true;
+			try (ResultSet rs = ps.executeQuery();) {
+				if (rs.next()) {
+					return true;
+				}
+				return false;
 			}
-			//ResultSet is empty
-			return false;
 		}
 	}
 	
@@ -110,63 +111,65 @@ public class UserDao {
 		String sql = "SELECT * FROM users WHERE username = ?;";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
 			ps.setString(1, username);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				return new User(
-						rs.getLong("user_id"), 
-						rs.getString("username"), 
-						rs.getString("password"),
-						rs.getString("facebook"), 
-						rs.getString("email"),
-						DateTimeConvertor.sqlToLdt(rs.getString("date_creation")), 
-						rs.getString("first_name"),
-						rs.getString("last_name"),
-						rs.getString("avatar_url"),
-						rs.getString("gender"));
-			} else {
-				throw new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND);
+			try (ResultSet rs = ps.executeQuery();) {
+				if (rs.next()) {
+					return new User(
+							rs.getLong("user_id"), 
+							rs.getString("username"), 
+							rs.getString("password"),
+							rs.getString("facebook"), 
+							rs.getString("email"),
+							DateTimeConvertor.sqlToLdt(rs.getString("date_creation")), 
+							rs.getString("first_name"),
+							rs.getString("last_name"),
+							rs.getString("avatar_url"),
+							rs.getString("gender"));
+				} else {
+					throw new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND);
+				}
 			}
 		}
 	}
 	
-	public User getUser(Long userId) throws SQLException, UserNotFoundException, UserException {
+	public User getUser(long userId) throws SQLException, UserNotFoundException, UserException {
 		String sql = "SELECT * FROM users WHERE user_id = ?;";
 		try (PreparedStatement ps = con.prepareStatement(sql);) {
 			ps.setLong(1, userId);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				return new User(
-						rs.getLong("user_id"), 
-						rs.getString("username"), 
-						rs.getString("password"),
-						rs.getString("facebook"), 
-						rs.getString("email"),
-						DateTimeConvertor.sqlToLdt(rs.getString("date_creation")), 
-						rs.getString("first_name"),
-						rs.getString("last_name"),
-						rs.getString("avatar_url"),
-						rs.getString("gender"));
-			} else {
-				throw new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND);
+			try (ResultSet rs = ps.executeQuery();) {
+				if (rs.next()) {
+					return new User(
+							rs.getLong("user_id"), 
+							rs.getString("username"), 
+							rs.getString("password"),
+							rs.getString("facebook"), 
+							rs.getString("email"),
+							DateTimeConvertor.sqlToLdt(rs.getString("date_creation")), 
+							rs.getString("first_name"),
+							rs.getString("last_name"),
+							rs.getString("avatar_url"),
+							rs.getString("gender"));
+				} else {
+					throw new UserNotFoundException(UserNotFoundException.USER_NOT_FOUND);
+				}
 			}
 		}
 	}
 
 	public boolean isFollowing(long user_id, long following_id) throws SQLException {
 		String sql = "SELECT * FROM users_follow_users WHERE user_id = ? AND follower_id = ?";
-		PreparedStatement ps = con.prepareStatement(sql);
-		ps.setLong(1, user_id);
-		ps.setLong(2, following_id);
-		ResultSet rs = ps.executeQuery();
-		if (rs.next()) {
-			return true;
+		try (PreparedStatement ps = con.prepareStatement(sql);) {
+			ps.setLong(1, user_id);
+			ps.setLong(2, following_id);
+			try (ResultSet rs = ps.executeQuery();) {
+				if (rs.next()) {
+					return true;
+				}
+				return false;
+			}
 		}
-		return false;
 	}
 
 	public void followUser(long user_id, long follower_id) throws SQLException {
-		System.out.println("user_id " + user_id);
-		System.out.println("follower_id " + follower_id);
 		String follow = "INSERT INTO users_follow_users (user_id,follower_id) VALUES(?,?);";
 		try (PreparedStatement ps = con.prepareStatement(follow);) {
 			ps.setLong(1, user_id);
@@ -176,8 +179,6 @@ public class UserDao {
 	}
 
 	public void unfollowUser(long user_id, long following_id) throws SQLException {
-		System.out.println("user_id " + user_id);
-		System.out.println("following_id " + following_id);
 		String unfollow = "DELETE FROM users_follow_users WHERE user_id = ? AND follower_id = ?;";
 		try (PreparedStatement ps = con.prepareStatement(unfollow);) {
 			ps.setLong(1, user_id);
@@ -190,23 +191,24 @@ public class UserDao {
 		String unfollow = "SELECT users.* FROM users_follow_users AS follower JOIN users ON (follower.follower_id = users.user_id) WHERE follower.user_id = ?;";
 		try (PreparedStatement ps = con.prepareStatement(unfollow);) {
 			ps.setLong(1, user_id);
-			ResultSet rs = ps.executeQuery();
-			List<User> followers = new ArrayList<>();
-			while (rs.next()) {
-				followers.add(
-						new User(
-								rs.getLong("user_id"), 
-								rs.getString("username"), 
-								rs.getString("password"),
-								rs.getString("facebook"), 
-								rs.getString("email"),
-								DateTimeConvertor.sqlToLdt(rs.getString("date_creation")), 
-								rs.getString("first_name"),
-								rs.getString("last_name"),
-								rs.getString("avatar_url"),
-								rs.getString("gender")));
+			try (ResultSet rs = ps.executeQuery();) {
+				List<User> followers = new ArrayList<>();
+				while (rs.next()) {
+					followers.add(
+							new User(
+									rs.getLong("user_id"), 
+									rs.getString("username"), 
+									rs.getString("password"),
+									rs.getString("facebook"), 
+									rs.getString("email"),
+									DateTimeConvertor.sqlToLdt(rs.getString("date_creation")), 
+									rs.getString("first_name"),
+									rs.getString("last_name"),
+									rs.getString("avatar_url"),
+									rs.getString("gender")));
+				}
+				return followers;
 			}
-			return followers;
 		}
 	}
 
@@ -214,24 +216,35 @@ public class UserDao {
 		String unfollow = "SELECT users.* FROM users_follow_users AS follower JOIN users ON (follower.user_id = users.user_id) WHERE follower.follower_id = ?;";
 		try (PreparedStatement ps = con.prepareStatement(unfollow);) {
 			ps.setLong(1, user_id);
-			ResultSet rs = ps.executeQuery();
-			List<User> following = new ArrayList<>();
-			while (rs.next()) {
-				following.add(
-						new User(
-								rs.getLong("user_id"), 
-								rs.getString("username"),
-								rs.getString("password"),
-								rs.getString("facebook"), 
-								rs.getString("email"),
-								DateTimeConvertor.sqlToLdt(rs.getString("date_creation")), 
-								rs.getString("first_name"),
-								rs.getString("last_name"),
-								rs.getString("avatar_url"),
-								rs.getString("gender")));
+			try (ResultSet rs = ps.executeQuery();) {
+				List<User> following = new ArrayList<>();
+				while (rs.next()) {
+					following.add(
+							new User(
+									rs.getLong("user_id"), 
+									rs.getString("username"),
+									rs.getString("password"),
+									rs.getString("facebook"), 
+									rs.getString("email"),
+									DateTimeConvertor.sqlToLdt(rs.getString("date_creation")), 
+									rs.getString("first_name"),
+									rs.getString("last_name"),
+									rs.getString("avatar_url"),
+									rs.getString("gender")));
+				}
+				return following;
 			}
-			return following;
 		}
 	}
 
+	public void delete(long userId) {
+		//TODO implement
+		//delete followers
+		//delete following
+		//delete comment likes
+		//delete comments
+		//delete videos
+		//delete video likes
+		//delete playlists
+	}
 }

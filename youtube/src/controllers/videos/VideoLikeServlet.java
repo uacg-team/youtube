@@ -24,26 +24,20 @@ public class VideoLikeServlet extends HttpServlet {
 			return;
 		}
 		int like = Integer.valueOf(request.getParameter("like"));
-		Long videoId = Long.valueOf(request.getParameter("videoId"));
-
+		
+		long videoId = Long.valueOf(request.getParameter("videoId"));
 		long userId = u.getUserId();
-		String url = request.getParameter("url");
 		try {
 			if (like == 1) {
-				// System.out.println("LikeVideo:"+videoId);
 				VideoDao.getInstance().like(videoId, userId);
 			}
 			if (like == -1) {
-				// System.out.println("disLikeVideo:"+videoId);
 				VideoDao.getInstance().disLike(videoId, userId);
 			}
 		} catch (SQLException e) {
 			request.getRequestDispatcher("player.jsp").forward(request, response);
 			e.printStackTrace();
 		}
-		response.sendRedirect("player?url="+url);
-		// request.getRequestDispatcher("player.jsp").forward(request, response);
-		// response.sendRedirect("player.jsp");
+		response.sendRedirect("player?videoId="+videoId);
 	}
-
 }

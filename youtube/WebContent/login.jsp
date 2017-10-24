@@ -8,7 +8,6 @@
 <title>Login</title>
 </head>
 <body>
-
 <jsp:include page="header.jsp"></jsp:include><br>
 
 <fieldset>

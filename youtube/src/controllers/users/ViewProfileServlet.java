@@ -35,21 +35,23 @@ public class ViewProfileServlet extends HttpServlet {
 		} catch (UserException e1) {
 			e1.printStackTrace();
 		}
+		
 		try {
 			List<User> followers = UserDao.getInstance().getFollowers(u.getUserId());
 			List<User> following = UserDao.getInstance().getFollowing(u.getUserId());
 			List<Video> videos = null;
-
-			videos = VideoDao.getInstance().getPublicVideos(u.getUserId());
-	
+			
 			if (loggedUser != null && loggedUser.getUserId() == u.getUserId()) {
 				videos = VideoDao.getInstance().getVideos(u.getUserId());
-			} 
+			} else {
+				videos = VideoDao.getInstance().getPublicVideos(u.getUserId());
+			}
 			
 			for (Video video : videos) {
 				video.setUserName(VideoDao.getInstance().getUserName(video.getUserId()));
 				video.setPrivacy(VideoDao.getInstance().getPrivacy(video.getPrivacyId()));
 			}
+			
 			request.setAttribute("user", u);
 			request.setAttribute("followers", followers);
 			request.setAttribute("following", following);

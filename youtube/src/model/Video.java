@@ -2,9 +2,7 @@ package model;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import model.exceptions.user.UserException;
@@ -53,9 +51,6 @@ public class Video implements Serializable {
 
 		this.date = LocalDateTime.now();
 		this.views = 0;
-	}
-	public void addTag(Tag t) {
-		this.tags.add(t);
 	}
 	
 	@Override

@@ -57,7 +57,7 @@ public class UploadVideoServlet extends HttpServlet {
 		}
 		
 		try {
-			Long privacy = Long.valueOf(request.getParameter("privacy"));
+			long privacy = Long.valueOf(request.getParameter("privacy"));
 			String fileName = Paths.get(newVideo.getSubmittedFileName()).getFileName().toString();
 			Video v = new Video(name, fileName , privacy, u.getUserId(), tags);
 			VideoDao.getInstance().createVideo(v);
