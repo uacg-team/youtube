@@ -22,8 +22,8 @@ public class PlaylistServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO forward to playlist preview
 		if(request.getSession().getAttribute("user")==null) {
+			response.setStatus(401);
 			response.sendRedirect("login");
 			return;
 		}

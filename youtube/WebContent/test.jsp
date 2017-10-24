@@ -8,13 +8,6 @@
 <title>Insert title here</title>
 </head>
 <body>
-<b>add to playlist</b>
-<select name="addToPlaylist" onchange="location = this.value;">
-	<c:forEach items="${requestScope.myPlaylists}" var="playlist">
-		 <option value="with ajax send post to playlist?playlistName=${playlist.playlistName}">${playlist.playlistName}</option>
-	</c:forEach>
-	
-</select>
-		
+<img alt="asdasda" src="test?path=defaultAvatar.png">
 </body>
 </html>
