@@ -13,12 +13,12 @@
 	<c:if test="${sessionScope.user!=null}">
 	<b><c:out value="${sessionScope.user.username}"></c:out></b>
 	<img src="img?path=${sessionScope.user.avatarUrl}&userId=${sessionScope.user.userId}" width="50px" height="auto"/>
-	</c:if>
 
-	<form action="comment?videoId=${requestScope.mainVideo.videoId}&url=${requestScope.mainVideo.locationUrl}" method="post">
-		New Comment<input type="text" placeholder="add comment" name="newComment"/>
-		<input type="submit" value="comment"/>
-	</form>
+		<form action="comment?videoId=${requestScope.mainVideo.videoId}&url=${requestScope.mainVideo.locationUrl}" method="post">
+			New Comment<input type="text" placeholder="add comment" name="newComment"/>
+			<input type="submit" value="comment"/>
+		</form>
+	</c:if>
 	<br>
 	<br>
 	<br>
@@ -58,7 +58,7 @@
 		</ul>
 		</div>
 		<c:if test="${sessionScope.user.userId==comment.userId}">
-			<form action="comment?deleteCommentId=${comment.commentId}&url=${requestScope.mainVideo.locationUrl}" method="post">
+			<form action="comment?deleteCommentId=${comment.commentId}&url=${requestScope.mainVideo.locationUrl}&videoId=${requestScope.mainVideo.videoId}" method="post">
 			<input type="submit" value="delete"/>
 			</form>
 		</c:if>

@@ -47,7 +47,7 @@ public class CommentLikeServlet extends HttpServlet {
 				return;
 			}
 			//TODO preprashta kym videoto CommentServlet!!!
-			response.sendRedirect("player?url="+request.getParameter("url"));
+			response.sendRedirect("player?url="+request.getParameter("url")+"&videoId="+request.getParameter("videoId"));
 		}
 	}
 

@@ -55,7 +55,7 @@ public class CommentServlet extends HttpServlet {
 				//TODO handle
 				e.printStackTrace();
 			}
-			response.sendRedirect("player?url="+request.getParameter("url"));
+			response.sendRedirect("player?url="+request.getParameter("url")+"&videoId="+request.getParameter("videoId"));
 		}
 	}
 	@Override
@@ -75,7 +75,7 @@ public class CommentServlet extends HttpServlet {
 			req.getRequestDispatcher("player").forward(req, resp);
 			return;
 		}
-		resp.sendRedirect("player?url="+req.getParameter("url"));
+		resp.sendRedirect("player?url="+req.getParameter("url")+"&videoId="+req.getParameter("videoId"));
 	}
 
 	public static HttpServletRequest loadCommentsForVideo(HttpServletRequest request,long videoId) {
