@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS `youtubeDB`.`users` (
   `last_name` VARCHAR(45) NULL,
   `avatar_url` VARCHAR(200) NULL,
   `gender` VARCHAR(45) NULL,
+  `register_token` VARCHAR(45) NULL,
+  `activated` TINYINT NULL DEFAULT 0,
   PRIMARY KEY (`user_id`),
   UNIQUE INDEX `username_UNIQUE` (`username` ASC),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC))
@@ -250,26 +252,3 @@ ENGINE = InnoDB;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-
-
-INSERT into privacy_settings (name) values('Private');
-INSERT into privacy_settings (name) values('Public');
-
-INSERT INTO users (username, password, email, date_creation) VALUES ('Hristo', 'Penev', 'hristo@penev.bg','2017-10-11');
-INSERT INTO users (username, password, email, date_creation) VALUES ('Velichko', 'Angelov', 'vel@angelov.bg','2017-10-11');
-
-INSERT into videos (name,date, location_url,user_id,privacy_id,views) VALUES('name1','2017-10-11','www.somewhere1.com',1,1,0);
-INSERT into videos (name,date, location_url,user_id,privacy_id,views) VALUES('name2','2017-10-11','www.somewhere2.com',2,2,0);
-
-INSERT into playlists (playlist_name,user_id) VALUES('playlist1',1);
-INSERT into playlists (playlist_name,user_id) VALUES('playlist2',2);
-
-INSERT into tags (tag) VALUES('tag1');
-INSERT into tags (tag) VALUES('tag2');
-
-INSERT into comments (text,date,video_id,user_id) VALUES('comment1','2017-10-11',1,1);
-INSERT into comments (text,date,video_id,user_id) VALUES('comment2','2017-10-11',2,2);
-
-INSERT into comments_likes (user_id,comment_id,isLike) VALUES(1,1,1);
-INSERT into comments_likes (user_id,comment_id,isLike) VALUES(2,2,0);
